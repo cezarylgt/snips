@@ -1,3 +1,5 @@
+from typing import List
+
 import snips.infrastructure.repository.tinydb_repository as tdb
 import snips.domain.snippet as snp
 import snips.domain.exceptions as ex
@@ -18,11 +20,12 @@ class TestTinyDbRepository:
         yield
         os.remove(self._TEST_DB_URI)
 
-    def _insert_random_snippet(self, id: str = 'drop db') -> snp.Snippet:
+    def _insert_random_snippet(self, id: str = 'drop db', tags: List[str] = None) -> snp.Snippet:
         e = snp.Snippet(
             id=id,
             snippet='DROP DATABASE',
-            desc='drops database'
+            desc='drops database',
+            tags=tags if tags else ['sql', 'db']
         )
         self.sut.save(e)
         return e
@@ -36,7 +39,7 @@ class TestTinyDbRepository:
         e = snp.Snippet(
             id='drop db',
             snippet='DROP DATABASE',
-            desc='drops database'
+            desc='drops database',
         )
 
         self.sut.save(e)
@@ -70,3 +73,18 @@ class TestTinyDbRepository:
 
         with pytest.raises(ex.SnippetNotFound):
             self.sut.get_by_id(e.id)
+
+    def test_get_by_tags_with_matching_mode_any_matches_any_tag(self):
+        e1 = self._insert_random_snippet()
+        e2 = self._insert_random_snippet(id='bash-list', tags=['bash'])
+        e3 = self._insert_random_snippet(id='xxx', tags=['xxx'])
+
+        result = self.sut.get_by_tags(['sql', 'bash'])
+        assert len(result) == 2
+
+    def test_get_by_tags_with_matching_mode_all_matches_only_when_snippet_inlcudes_all_tags(self):
+        e1 = self._insert_random_snippet(tags=['sql', 'python'])
+        e2 = self._insert_random_snippet(id='bash-list', tags=['bash'])
+
+        assert len(self.sut.get_by_tags(['sql', 'bash'], mode='all')) == 0
+        assert len(self.sut.get_by_tags(['sql'], mode='all')) == 1

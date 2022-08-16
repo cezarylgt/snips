@@ -12,6 +12,10 @@ def deserialize(di: dict) -> Snippet:
     return Snippet(**di)
 
 
+def deserialize_many(dis: List[dict]) -> List[Snippet]:
+    return [deserialize(di) for di in dis if di is not None]
+
+
 class TinyDbSnipperRepository(ISnippetRepository):
 
     def __init__(self, path: str = settings.DB_URI):
@@ -21,7 +25,7 @@ class TinyDbSnipperRepository(ISnippetRepository):
         self._query = Query()
 
     def get_all(self) -> List[Snippet]:
-        return [deserialize(x) for x in self.table.all()]
+        return deserialize_many(self.table.all())
 
     def save(self, snp: Snippet) -> Snippet:
         doc_id = self.table.upsert(snp.dict(), self._query.id == snp.id)[0]
@@ -32,6 +36,13 @@ class TinyDbSnipperRepository(ISnippetRepository):
         if result:
             return deserialize(result)
         raise ex.SnippetNotFound.with_message(id)
+
+    def get_by_tags(self, tags: List[str], mode='any') -> List[Snippet]:
+        assert mode in ['any', 'all']
+
+        if mode == 'any':
+            return deserialize_many(self.table.search(self._query.tags.any(tags)))
+        return deserialize_many(self.table.search(self._query.tags.all(tags)))
 
     def delete_by_id(self, id: str) -> None:
         self.table.remove(self._query.id == id)

@@ -13,6 +13,18 @@ class ISnippetRepository:
     def get_all(self) -> List[Snippet]: ...
 
     @abc.abstractmethod
+    def get_by_tags(self, tags: List[str], mode='any') -> List[Snippet]:
+        """
+
+        :param tags:
+        :param mode:
+             'any' - search by any tag matching with snippet
+             'all' - search by all tags matching with snippet
+        :return:
+        """
+        ...
+
+    @abc.abstractmethod
     def save(self, snp: Snippet) -> Snippet: ...
 
     @abc.abstractmethod

@@ -4,6 +4,7 @@ import snips.domain as dm
 from ioc import get_ioc
 from snips.infrastructure import IConsoleLogger
 from rich.prompt import Prompt
+import pyperclip
 
 
 class Snips(typer.Typer):
@@ -34,15 +35,22 @@ def inject():
 
 
 @app.command()
-def get(path: str):
+def show(path: str):
     result = app.repository.get_by_id(path)
     app.console_logger.log(result)
 
 
 @app.command()
-def get_all():
+def show_all():
     result = app.repository.get_all()
     app.console_logger.log_many(result)
+
+
+@app.command()
+def get(path: str):
+    result = app.repository.get_by_id(path)
+    pyperclip.copy(result.snippet)
+    print(f"{result.snippet} copied!")
 
 
 @app.command()
