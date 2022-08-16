@@ -10,7 +10,9 @@ Pygments==2.13.0
 pyparsing==3.0.9
 pyperclip==1.8.2
 pytest==7.1.2
+python-dotenv==0.20.0
 rich==12.5.1
 shellingham==1.5.0
+tinydb==4.7.0
 tomli==2.0.1
 typer==0.6.1
