@@ -25,7 +25,6 @@ class TinyDbSnipperRepository(ISnippetRepository):
 
     def save(self, snp: Snippet) -> Snippet:
         doc_id = self.table.upsert(snp.dict(), self._query.id == snp.id)[0]
-        print('doc id', doc_id)
         return deserialize(self.table.get(doc_id=doc_id))
 
     def get_by_id(self, id: str) -> Snippet:
