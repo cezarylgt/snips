@@ -5,6 +5,7 @@ import snips.settings as settings
 import snips.infrastructure as infra
 
 from snips.domain import ISnippetRepository
+from snips.domain.service import SnippetService
 
 
 class DbProvider(str, Enum):
@@ -36,13 +37,16 @@ class ConsoleLoggerFactory:
 
 
 @dataclass
-class Container:
-    snippet_repository: ISnippetRepository
+class IocContainer:
+    repository: ISnippetRepository
     console_logger: infra.IConsoleLogger
+    service: SnippetService
 
 
-def get_ioc() -> Container:
-    return Container(
-        repository_factory(),
-        ConsoleLoggerFactory.create(settings.LOGGER_PROVIDER)
+def get_ioc() -> IocContainer:
+    repository = repository_factory()
+    return IocContainer(
+        repository,
+        ConsoleLoggerFactory.create(settings.LOGGER_PROVIDER),
+        SnippetService(repository)
     )

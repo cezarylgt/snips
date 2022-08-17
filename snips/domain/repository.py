@@ -1,7 +1,13 @@
 import abc
+from enum import Enum
 from typing import List
 
 from snips.domain.snippet import Snippet
+
+
+class TagMatchingMode(str, Enum):
+    any = 'any'
+    all = 'all'
 
 
 class ISnippetRepository:
@@ -13,7 +19,7 @@ class ISnippetRepository:
     def get_all(self) -> List[Snippet]: ...
 
     @abc.abstractmethod
-    def get_by_tags(self, tags: List[str], mode='any') -> List[Snippet]:
+    def get_by_tags(self, tags: List[str], mode: TagMatchingMode = TagMatchingMode.any) -> List[Snippet]:
         """
 
         :param tags:
@@ -29,3 +35,5 @@ class ISnippetRepository:
 
     @abc.abstractmethod
     def delete_by_id(self, id: str) -> None: ...
+
+    def exists(self, alias: str): ...

@@ -22,7 +22,7 @@ class TestTinyDbRepository:
 
     def _insert_random_snippet(self, id: str = 'drop db', tags: List[str] = None) -> snp.Snippet:
         e = snp.Snippet(
-            id=id,
+            alias=id,
             snippet='DROP DATABASE',
             desc='drops database',
             tags=tags if tags else ['sql', 'db']
@@ -37,13 +37,13 @@ class TestTinyDbRepository:
 
     def test_saves(self):
         e = snp.Snippet(
-            id='drop db',
+            alias='drop db',
             snippet='DROP DATABASE',
             desc='drops database',
         )
 
         self.sut.save(e)
-        result = self.sut.get_by_id(e.id)
+        result = self.sut.get_by_id(e.alias)
         assert result
 
     def test_get_all_should_return_data_if_snippets_exist(self):
@@ -59,7 +59,7 @@ class TestTinyDbRepository:
 
     def test_get_by_id_should_find_and_convert_to_snippet(self):
         e = self._insert_random_snippet('drop_db')
-        result = self.sut.get_by_id(e.id)
+        result = self.sut.get_by_id(e.alias)
         print(result)
         assert isinstance(result, snp.Snippet)
 
@@ -69,10 +69,10 @@ class TestTinyDbRepository:
 
     def test_delete_by_id_should_remove(self):
         e = self._insert_random_snippet()
-        self.sut.delete_by_id(e.id)
+        self.sut.delete_by_id(e.alias)
 
         with pytest.raises(ex.SnippetNotFound):
-            self.sut.get_by_id(e.id)
+            self.sut.get_by_id(e.alias)
 
     def test_get_by_tags_with_matching_mode_any_matches_any_tag(self):
         e1 = self._insert_random_snippet()

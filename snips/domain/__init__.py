@@ -1,2 +1,2 @@
-from .repository import ISnippetRepository
-from .snippet import Snippet
+from .repository import ISnippetRepository, TagMatchingMode
+from .snippet import Snippet, SnippetDto

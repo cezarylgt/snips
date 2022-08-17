@@ -1,0 +1,9 @@
+prompt:
+  ask_alias: Set alias
+  ask_snippet: Set snippet
+  ask_description: Set description
+  ask_tags: Set tags (separated by ',')
+  ask_defaults: Set default arguments
+
+validation:
+  alias_invalid_pattern: \s+|=|*

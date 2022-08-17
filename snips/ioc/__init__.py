@@ -1,1 +1,1 @@
-from .ioc import get_ioc
+from .ioc import get_ioc, IocContainer

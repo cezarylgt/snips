@@ -1,6 +1,6 @@
 from typing import List
 
-from snips.domain import ISnippetRepository, Snippet
+from snips.domain import ISnippetRepository, Snippet, TagMatchingMode
 import snips.domain.exceptions as ex
 from tinydb import TinyDB, Query
 import snips.settings as settings
@@ -28,16 +28,16 @@ class TinyDbSnipperRepository(ISnippetRepository):
         return deserialize_many(self.table.all())
 
     def save(self, snp: Snippet) -> Snippet:
-        doc_id = self.table.upsert(snp.dict(), self._query.id == snp.id)[0]
+        doc_id = self.table.upsert(snp.dict(), self._query.alias == snp.alias)[0]
         return deserialize(self.table.get(doc_id=doc_id))
 
     def get_by_id(self, id: str) -> Snippet:
-        result = self.table.get(self._query.id == id)
+        result = self.table.get(self._query.alias == id)
         if result:
             return deserialize(result)
         raise ex.SnippetNotFound.with_message(id)
 
-    def get_by_tags(self, tags: List[str], mode='any') -> List[Snippet]:
+    def get_by_tags(self, tags: List[str], mode: TagMatchingMode = TagMatchingMode.any) -> List[Snippet]:
         assert mode in ['any', 'all']
 
         if mode == 'any':
@@ -45,4 +45,7 @@ class TinyDbSnipperRepository(ISnippetRepository):
         return deserialize_many(self.table.search(self._query.tags.all(tags)))
 
     def delete_by_id(self, id: str) -> None:
-        self.table.remove(self._query.id == id)
+        self.table.remove(self._query.alias == id)
+
+    def exists(self, alias: str) -> bool:
+        return bool(self.table.get(self._query.alias == alias))
