@@ -20,6 +20,7 @@ snips/domain/exceptions.py
 snips/domain/repository.py
 snips/domain/service.py
 snips/domain/snippet.py
+snips/domain/validators.py
 snips/entrypoints/__init__.py
 snips/entrypoints/cli/__init__.py
 snips/entrypoints/cli/cli.py

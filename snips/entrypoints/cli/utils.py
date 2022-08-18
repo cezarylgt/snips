@@ -7,6 +7,8 @@ from snips.infrastructure import IConsoleLogger
 from snips.ioc import get_ioc
 import os
 
+EMOJI = ":question:"
+
 
 class Snips(typer.Typer):
     repository: dm.ISnippetRepository
@@ -25,13 +27,17 @@ def bootstrap() -> Snips:
 
 
 def dto_from_prompt(df: dm.Snippet = None) -> dm.SnippetDto:
-    alias = Prompt.ask("Set alias", default=df.alias if df else None)
-    snippet = Prompt.ask("Set snippet", default=df.snippet if df else None)
-    desc = Prompt.ask("Set description", default=df.desc if df else None)
-    input_tags = Prompt.ask("Set tags (separeted by ',') ",
+    alias = Prompt.ask(f"{EMOJI} Alias", default=df.alias if df else None)
+    dm.Validators.alias_cannot_have_white_chars(alias)
+
+    snippet = Prompt.ask(f"{EMOJI} Snippet", default=df.snippet if df else None)
+    dm.Validators.snippet_cannot_be_empty(snippet)
+
+    desc = Prompt.ask(f"{EMOJI} Description", default=df.desc if df else None)
+    input_tags = Prompt.ask(f"{EMOJI} Tags (separeted by ',') ",
                             default=', '.join(df.tags) if df else None
                             )
-    defaults = Prompt.ask("Set default values for provided arguments", default=df.defaults if df else None)
+    defaults = Prompt.ask(f"{EMOJI} Default values for provided arguments", default=df.defaults if df else None)
 
     if isinstance(input_tags, str):
         input_tags = [t.strip() for t in input_tags.split(',')]
@@ -56,9 +62,8 @@ def prepare_command(snp: dm.Snippet, provided_arguments: dict = None) -> str:
         print("Provide missing snippet arguments:")
 
         for arg in missing_args:
-            args[arg] = Prompt.ask(arg)
+            args[arg] = Prompt.ask(f"{EMOJI} {arg}")
     return snp.parse_command(args)
-
 
 
 def parse_dict(string: str) -> dict:

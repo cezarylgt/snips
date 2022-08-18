@@ -1,10 +1,12 @@
 from dataclasses import dataclass, asdict
 from datetime import datetime
-from typing import List, Collection, Set
+from typing import List, Collection, Set, Optional
 import re
 import snips.domain.exceptions as ex
 
 from pydantic import BaseModel, validator
+
+from snips.domain.validators import Validators
 
 
 def remove_argument_tags(arguments: List[str]) -> set:
@@ -54,15 +56,19 @@ class Snippet:
 class SnippetDto(BaseModel):
     alias: str
     snippet: str
-    desc: str
+    desc: Optional[str]
     tags: List[str] = None
     defaults: dict = None
 
-    @validator('alias')
-    def alias_cannot_have_white_chars(cls, v):
-        if re.search('\s+', v):
-            raise ex.AliasInvalidCharacter(v)
-        return v
+    _alias_cannot_have_white_chars = validator('alias')(Validators.alias_cannot_have_white_chars)
+    _snippet_cannot_be_empty = validator('snippet')(Validators.snippet_cannot_be_empty)
+
+    def __init__(self, **data):
+        if data.get('tags'):
+            data['tags'] = Validators.trim_tags(data.get('tags'))
+
+        super(SnippetDto, self).__init__(**data)
+
 
     def to_entity(self) -> Snippet:
         return Snippet(

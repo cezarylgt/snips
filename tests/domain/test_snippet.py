@@ -1,7 +1,7 @@
 import pytest
+from pydantic import ValidationError
 
 import snips.domain as dm
-import snips.domain.exceptions as ex
 
 
 @pytest.mark.unit
@@ -70,10 +70,31 @@ class TestSnippet:
 @pytest.mark.unit
 class TestCreateSnippetDto:
 
-    def test_alias_validator(self):
-        with pytest.raises(ex.AliasInvalidCharacter):
+    def test_alias_validator_during_initialization(self):
+        with pytest.raises(ValidationError):
             request = dm.SnippetDto(
                 alias='alias with white char',
                 snippet='bla bla',
                 desc='',
             )
+
+    def test_snippet_cannot_be_blank(self):
+        with pytest.raises(ValidationError) as err:
+            request = dm.SnippetDto(
+                alias='alias',
+                snippet=' ',
+                desc='',
+            )
+
+        exc: ValidationError = err.value
+        assert 'Snippet cannot be empty' in exc.errors()[0]['msg']
+
+    def test_trims_tags_after_init(self):
+        request = dm.SnippetDto(
+            alias='alias',
+            snippet='bla bla',
+            desc='',
+            tags=['python   ', ' bash']
+        )
+        assert set(request.tags) == {'python', 'bash'}
+

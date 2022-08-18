@@ -3,6 +3,7 @@ from typing import List, Optional
 
 import pyperclip
 import typer
+from rich import print as rich_print
 
 import snips.domain as dm
 from .utils import bootstrap, dto_from_prompt, prepare_command, parse_dict
@@ -13,39 +14,42 @@ tags_app = typer.Typer()
 app.add_typer(tags_app, name='tags')
 app.add_typer(config_app, name='config')
 
+
 # QUERIES
 @app.command()
 def show(alias: str):
     """Show snippet data"""
     result = app.repository.get_by_id(alias)
-    app.console_logger.log(result)
+    app.console_logger.log_snippets(result)
 
 
 @app.command()
 def ls():
     """List all available snippets"""
     result = app.repository.get_all()
-    app.console_logger.log_many(result)
+    app.console_logger.log_snippets(*result)
 
 
 @app.command()
-def get(alias: str, prompt: bool = typer.Option(True)):
+def get(alias: str,
+        raw: bool = typer.Option(False, help="Flag whether to use interpolate snippet with defaults or prompt")):
     """Copy snippet value into clipboard"""
     snippet = app.repository.get_by_id(alias)
 
-    if prompt:
+    if not raw:
         cmd = prepare_command(snippet)
     else:
         cmd = snippet.snippet
+
     pyperclip.copy(cmd)
-    print(f"{cmd} copied!")
+    rich_print(f"[green]'{cmd}'[/green] copied!")
 
 
 @tags_app.command('get')
 def tags_get(tags: List[str], mode: dm.TagMatchingMode = dm.TagMatchingMode.any):
     """Search snippets by tags"""
     result = app.repository.get_by_tags(tags, mode)
-    app.console_logger.log_many(result)
+    app.console_logger.log_snippets(*result)
 
 
 # /QUERIES
@@ -55,7 +59,7 @@ def tags_get(tags: List[str], mode: dm.TagMatchingMode = dm.TagMatchingMode.any)
 def delete(alias: str):
     """Remove snippet """
     app.repository.delete_by_id(alias)
-    print(f"Snippet: {alias} deleted")
+    rich_print(f"Snippet: [blue]{alias}[/blue] deleted")
 
 
 @app.command()
@@ -63,7 +67,7 @@ def add():
     """Create new snippet"""
     dto = dto_from_prompt()
     e = app.service.create(dto)
-    app.console_logger.log(e)
+    app.console_logger.log_snippets(e)
 
 
 @app.command()
@@ -76,7 +80,7 @@ def edit(alias: str,
          ):
     """Update existing snippet"""
     snippet = app.repository.get_by_id(alias)
-    app.console_logger.log(snippet)
+    app.console_logger.log_snippets(snippet)
 
     if any((a, s, desc, tags, defaults)):
         dto = dm.SnippetDto(
@@ -90,7 +94,7 @@ def edit(alias: str,
         dto = dto_from_prompt(snippet)
 
     e = app.service.update(dto)
-    app.console_logger.log(e)
+    app.console_logger.log_snippets(e)
 
 
 @app.command()

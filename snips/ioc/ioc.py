@@ -30,6 +30,6 @@ def get_ioc() -> IocContainer:
     repository = repository_factory()
     return IocContainer(
         repository,
-        ConsoleLoggerFactory.create(settings.LOGGER_PROVIDER),
+        ConsoleLoggerFactory.create(settings.CONSOLE_OUTPUT),
         SnippetService(repository)
     )
