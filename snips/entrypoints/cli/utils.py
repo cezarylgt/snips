@@ -48,8 +48,16 @@ def dto_from_prompt(df: dm.Snippet = None, snippet: str = None) -> dm.SnippetDto
         snippet=snippet,
         desc=desc,
         tags=input_tags,
-        defaults=defaults
+        defaults=parse_dict(defaults)
     )
+
+
+def prepare_command_with_args(snp: dm.Snippet) -> str:
+    arguments = snp.get_arguments()
+    args = dict()
+    for arg in arguments:
+        args[arg] = Prompt.ask(f"{_EMOJI} {arg}")
+    return snp.parse_command(args)
 
 
 def prepare_command(snp: dm.Snippet, provided_arguments: dict = None) -> str:
@@ -72,6 +80,8 @@ def parse_dict(string: str) -> dict:
         key1=value1,key2=value2
     where ',' separates dict items, left side of '=' is key, and right side of '=' is value.
     """
+
+    print('PARSING STRING,', string)
     if string is None:
         return dict()
 
@@ -80,7 +90,7 @@ def parse_dict(string: str) -> dict:
     for sentry in str_entries:
         key, value = sentry.split('=')
         di[key] = value
-
+    print('RETURNING STRING', di)
     return di
 
 

@@ -34,6 +34,7 @@ snips/infrastructure/repository/tinydb_repository.py
 snips/ioc/__init__.py
 snips/ioc/ioc.py
 tests/__init__.py
+tests/test_settings.py
 tests/../.env
 tests/../snp.sh
 tests/domain/__init__.py

@@ -54,15 +54,16 @@ class PrettyConsoleLogger(IConsoleLogger):
         rich_print(self._convert(snp))
 
     def print(self, o: Any):
-        rich_print(o)
+        rich_print(f'[{Styles.text}]{o}[/{Styles.text}]')
 
     def _convert(self, snp: dm.Snippet) -> str:
         # return f"""[bold blue]{snp.id}[/bold blue] [green]{snp.snippet}[/green] [yellow]{snp.desc}[/yellow]"""
         return rf"""
 [{Styles.header}]Alias:[/{Styles.header}] [{Styles.text}]{snp.alias}[/{Styles.text}]
-[{Styles.header}]Description:[/{Styles.header}] [{Styles.text}]{snp.desc}[/{Styles.text}]
+[{Styles.header}]Snippet:[/{Styles.header}] [{Styles.snippet}]{snp.snippet}[/{Styles.snippet}]
+[{Styles.header}]Defaults:[/{Styles.header}] [{Styles.text}]{snp.defaults}[/{Styles.text}]
 [{Styles.header}]Tags[/{Styles.header}]: [{Styles.text}]{' '.join(snp.tags or [])} [/{Styles.text}]
-[{Styles.header}]Snippet:[/{Styles.header}] [{Styles.snippet}]{snp.snippet}[/{Styles.snippet}]"""
+[{Styles.header}]Description:[/{Styles.header}] [{Styles.text}]{snp.desc}[/{Styles.text}]"""
 
 
 class TableConsoleLogger(IConsoleLogger):

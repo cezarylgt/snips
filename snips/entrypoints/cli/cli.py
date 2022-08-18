@@ -6,9 +6,8 @@ import typer
 from rich import print as rich_print
 
 import snips.domain as dm
-from .utils import bootstrap, dto_from_prompt, prepare_command, read_file, parse_dict
+from .utils import bootstrap, dto_from_prompt, prepare_command, read_file, parse_dict, prepare_command_with_args
 from .config import app as config_app
-
 
 app = bootstrap()
 tags_app = typer.Typer()
@@ -40,19 +39,22 @@ def tags_get(tags: List[str], mode: dm.TagMatchingMode = dm.TagMatchingMode.any)
 
 @app.command()
 def get(alias: str,
-        raw: bool = typer.Option(False, help="Flag whether to use interpolate snippet with defaults or prompt")):
+        raw: bool = typer.Option(False, help="Flag whether to use interpolate snippet with defaults or prompt"),
+        defaults: bool = typer.Option(True, help="Whether to auo parse command with default arguments")
+        ):
     """Copy snippet value into clipboard"""
     snippet = app.repository.get_by_id(alias)
 
     cmd = snippet.snippet
     if snippet.get_arguments() and not raw:
-        cmd = prepare_command(snippet)
+        if defaults:
+            cmd = prepare_command(snippet)
+        else:
+            cmd = prepare_command_with_args(snippet)
 
     pyperclip.copy(cmd)
-    rich_print(f"[green]'{cmd}'[/green]\n copied!")
-
-
-"""ls <@arg>directory</@arg>  """
+    print('Copied:')
+    app.console_logger.print(f"{cmd}")
 
 
 # /QUERIES
@@ -91,16 +93,19 @@ def edit(alias: str,
     """Update existing snippet"""
     snippet = app.repository.get_by_id(alias)
 
+    print(defaults)
+
     if any((a, s, desc, tags, defaults)):
         dto = dm.SnippetDto(
             alias=a or snippet.alias,
             snippet=s or snippet.snippet,
             desc=desc or snippet.desc,
             tags=tags or snippet.tags,
-            defauts=defaults or snippet.defaults
+            defaults=parse_dict(defaults) if defaults else snippet.defaults
         )
     else:
         dto = dto_from_prompt(snippet)
+    print(dto)
 
     e = app.service.update(dto)
     app.console_logger.log_snippets(e)
