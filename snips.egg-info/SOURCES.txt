@@ -23,6 +23,7 @@ snips/domain/snippet.py
 snips/entrypoints/__init__.py
 snips/entrypoints/cli/__init__.py
 snips/entrypoints/cli/cli.py
+snips/entrypoints/cli/config.py
 snips/entrypoints/cli/utils.py
 snips/infrastructure/__init__.py
 snips/infrastructure/console_logger/__init__.py

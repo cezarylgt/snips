@@ -6,11 +6,12 @@ import typer
 
 import snips.domain as dm
 from .utils import bootstrap, dto_from_prompt, prepare_command, parse_dict
+from .config import app as config_app
 
 app = bootstrap()
 tags_app = typer.Typer()
 app.add_typer(tags_app, name='tags')
-
+app.add_typer(config_app, name='config')
 
 # QUERIES
 @app.command()

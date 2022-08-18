@@ -6,6 +6,7 @@ import snips.infrastructure as infra
 
 from snips.domain import ISnippetRepository
 from snips.domain.service import SnippetService
+from snips.infrastructure.console_logger.console_logger import ConsoleLoggerFactory
 
 
 class DbProvider(str, Enum):
@@ -16,24 +17,6 @@ def repository_factory(provider: DbProvider = settings.DB_PROVIDER):
     if provider == DbProvider.JSON:
         return infra.tinydb_repository.TinyDbSnipperRepository()
     raise ValueError("Unknown configuration value for: DB_PROVIDER")
-
-
-class ConsoleLoggerProvider(str, Enum):
-    POOR = 'poor'
-    JSON = 'json'
-    PRETTY = 'pretty'
-
-
-class ConsoleLoggerFactory:
-    _mapping = {
-        ConsoleLoggerProvider.POOR: infra.PrettyConsoleLogger,
-        ConsoleLoggerProvider.JSON: infra.JsonConsoleLogger,
-        ConsoleLoggerProvider.PRETTY: infra.PrettyConsoleLogger
-    }
-
-    @staticmethod
-    def create(logger_provider: ConsoleLoggerProvider) -> infra.IConsoleLogger:
-        return ConsoleLoggerFactory._mapping[logger_provider]()
 
 
 @dataclass

@@ -1,8 +1,10 @@
 import abc
+from enum import Enum
 from typing import List
 
 import snips.domain as dm
 from rich import print as rich_print
+
 
 
 class IConsoleLogger:
@@ -49,3 +51,21 @@ class PrettyConsoleLogger(IConsoleLogger):
     def log_many(self, snps: List[dm.Snippet]) -> None:
         for snp in snps:
             rich_print(self._convert(snp))
+
+
+class ConsoleLoggerProvider(str, Enum):
+    POOR = 'poor'
+    JSON = 'json'
+    PRETTY = 'pretty'
+
+
+class ConsoleLoggerFactory:
+    _mapping = {
+        ConsoleLoggerProvider.POOR: PrettyConsoleLogger,
+        ConsoleLoggerProvider.JSON: JsonConsoleLogger,
+        ConsoleLoggerProvider.PRETTY: PrettyConsoleLogger
+    }
+
+    @staticmethod
+    def create(logger_provider: ConsoleLoggerProvider) -> IConsoleLogger:
+        return ConsoleLoggerFactory._mapping[logger_provider]()
