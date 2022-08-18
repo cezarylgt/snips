@@ -42,7 +42,7 @@ You can declare snippet with arguments that will be interpolated from  `snippet.
 
 To do this you have to write `snippet.snippet` attribute as
 
-`ls {directory}`
+`ls <@arg>directory</@arg>`
 
 Then run it with:
 `snp run :snippet.alias` (prompt will ask for directory argument)
@@ -96,7 +96,7 @@ Configuration contains following attributes:
 `CONSOLE_OUTPUT`: manages output display
 
 `DB_PROVIDER`: sets your persistence layer provider.
-For now only file-based document oriented database (provided by TinyDB) is supported, which maps to: `json` value.
+For now, only file-based document oriented database (provided by TinyDB) is supported, which maps to: `json` value.
 
 `DB_URI`: uri for your database. With `DB_PROVIDER=json` this must be path to .json file.
 

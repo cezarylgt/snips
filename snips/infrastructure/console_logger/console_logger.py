@@ -1,20 +1,22 @@
 import abc
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Any
 
+from rich import print as rich_print
+from rich.console import Console
 from rich.table import Table
 
 import snips.domain as dm
-from rich import print as rich_print
-from rich.console import Console
 
 
 class IConsoleLogger:
-    output: callable
 
     def log_snippets(self, *snps: dm.Snippet) -> None:
         for snp in snps:
             self._log_snippet(snp)
+
+    def print(self, o: Any):
+        print(o)
 
     @abc.abstractmethod
     def _log_snippet(self, snp: dm.Snippet) -> None: ...
@@ -32,6 +34,9 @@ class PoorConsoleLoger(IConsoleLogger):
 
 class JsonConsoleLogger(IConsoleLogger):
 
+    def print(self, o: Any):
+        rich_print(o)
+
     def _log_snippet(self, snp: dm.Snippet) -> None:
         rich_print(snp.dict())
 
@@ -40,6 +45,9 @@ class PrettyConsoleLogger(IConsoleLogger):
 
     def _log_snippet(self, snp: dm.Snippet) -> None:
         rich_print(self._convert(snp))
+
+    def print(self, o: Any):
+        rich_print(o)
 
     def _convert(self, snp: dm.Snippet) -> str:
         # return f"""[bold blue]{snp.id}[/bold blue] [green]{snp.snippet}[/green] [yellow]{snp.desc}[/yellow]"""
@@ -54,20 +62,20 @@ class TableConsoleLogger(IConsoleLogger):
     _FIELD_ORDER = ['alias', 'snippet', 'defaults', 'tags', 'desc']
 
     def __init__(self):
-        self._CONSOLE = Console()
+        self._console = Console()
 
     def _log_snippet(self, *snps: dm.Snippet) -> None:
         table = Table(*[f"[blue]{f}[/blue]" for f in self._FIELD_ORDER])
         for snp in snps:
             values = [str(snp.dict()[field]) for field in self._FIELD_ORDER]
             table.add_row(*values)
-        self._CONSOLE.print(table)
+        self._console.print(table)
 
     def log_snippets(self, *snps: dm.Snippet) -> None:
         self._log_snippet(*snps)
 
 
-class ConsoleLoggerProvider(str, Enum):
+class ConsoleLoggerProviderEnum(str, Enum):
     POOR = 'poor'
     JSON = 'json'
     PRETTY = 'pretty'
@@ -76,12 +84,12 @@ class ConsoleLoggerProvider(str, Enum):
 
 class ConsoleLoggerFactory:
     _mapping = {
-        ConsoleLoggerProvider.POOR: PrettyConsoleLogger,
-        ConsoleLoggerProvider.JSON: JsonConsoleLogger,
-        ConsoleLoggerProvider.PRETTY: PrettyConsoleLogger,
-        ConsoleLoggerProvider.TABLE: TableConsoleLogger
+        ConsoleLoggerProviderEnum.POOR: PrettyConsoleLogger,
+        ConsoleLoggerProviderEnum.JSON: JsonConsoleLogger,
+        ConsoleLoggerProviderEnum.PRETTY: PrettyConsoleLogger,
+        ConsoleLoggerProviderEnum.TABLE: TableConsoleLogger
     }
 
     @staticmethod
-    def create(logger_provider: ConsoleLoggerProvider) -> IConsoleLogger:
+    def create(logger_provider: ConsoleLoggerProviderEnum) -> IConsoleLogger:
         return ConsoleLoggerFactory._mapping[logger_provider]()

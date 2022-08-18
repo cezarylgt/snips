@@ -1,6 +1,9 @@
 import typer
 import snips.settings as settings
 from dotenv import dotenv_values, set_key
+from snips.infrastructure.console_logger import ConsoleLoggerProviderEnum
+from rich import print, print_json
+from rich.pretty import pprint
 
 
 def load_configuration() -> dict:
@@ -8,6 +11,8 @@ def load_configuration() -> dict:
 
 
 app = typer.Typer()
+set_app = typer.Typer(name='set', help="Manage configuration variables")
+app.add_typer(set_app)
 
 
 @app.command()
@@ -17,7 +22,29 @@ def show():
     print(dict(cfg))
 
 
-@app.command("set")
-def set_variable(var: settings.ConfigEnum, value: str ):
-    """Set configuration variable"""
+@set_app.command("env")
+def set_variable(var: settings.ConfigEnum, value: str):
+    """Set configuration variable py providing name and value"""
     set_key(settings.CONFIG_PATH, var, value)
+
+
+@set_app.command()
+def db_uri(uri: str):
+    """Change your db uri.
+    If DB_PROVIDER is set to 'json', this must be path to .json file
+    """
+    set_key(settings.CONFIG_PATH, settings.ConfigEnum.DB_URI, uri)
+
+
+@set_app.command()
+def format(format: ConsoleLoggerProviderEnum):
+    """
+    Change your display format
+    """
+    set_key(settings.CONFIG_PATH, settings.ConfigEnum.FORMAT, format)
+
+
+@app.command()
+def path():
+    """returns path to your configuration"""
+    print(settings.CONFIG_PATH)

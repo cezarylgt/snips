@@ -9,9 +9,49 @@ from pydantic import BaseModel, validator
 from snips.domain.validators import Validators
 
 
-def remove_argument_tags(arguments: List[str]) -> set:
-    replace = lambda x: re.sub('\{|}|\s*', '', x)
-    return {replace(s) for s in arguments}
+class ISnippetVarsProcessor:
+    OPENING_TAG: str
+    CLOSING_TAG: str
+    OPENING_TAG_PATTERN: str
+    CLOSING_TAG_PATTERN: str
+    TAG_PATTERN: str
+    REMOVAL_TAG_PATTERN: str
+
+    @classmethod
+    def clean_string(cls, string: str, interpolation=False) -> str:
+        """
+
+        :param string: string that should be processed with tags indetification
+        :param interpolation: wheter to replace identified vars with python interpolation placeholder
+        :return: string without vars tags
+        """
+        dirty_arguments = re.findall(cls.TAG_PATTERN, string)
+
+        for arg in dirty_arguments:
+            clean_arg = cls._clean(arg, interpolation)
+            string = string.replace(arg, clean_arg)
+        return string
+
+    @classmethod
+    def _clean(cls, string: str, interpolation=False) -> str:
+        clean_arg = re.sub(cls.REMOVAL_TAG_PATTERN, '', string)
+        if interpolation:
+            clean_arg = '{' + clean_arg + '}'
+        return string.replace(string, clean_arg)
+
+    @classmethod
+    def find_and_clean(cls, string: str) -> set:
+        dirty_arguments = re.findall(cls.TAG_PATTERN, string)
+        return {cls._clean(s) for s in dirty_arguments}
+
+
+class ArgumentTagProcessor(ISnippetVarsProcessor):
+    OPENING_TAG = '<@arg>'
+    CLOSING_TAG = '</@arg>'
+    OPENING_TAG_PATTERN = OPENING_TAG
+    CLOSING_TAG_PATTERN = '<\/@arg>'
+    TAG_PATTERN = f'{OPENING_TAG_PATTERN}\s*\w+\s*{CLOSING_TAG_PATTERN}'  # '\{\s*\w+\s*}'
+    REMOVAL_TAG_PATTERN = f'{OPENING_TAG_PATTERN}|{CLOSING_TAG_PATTERN}|\s+'
 
 
 @dataclass
@@ -28,7 +68,7 @@ class Snippet:
         return asdict(self)
 
     def get_arguments(self) -> set[str]:
-        return remove_argument_tags(re.findall('\{\s*\w+\s*}', self.snippet))
+        return ArgumentTagProcessor.find_and_clean(self.snippet)
 
     def all_arguments_have_defaults(self):
         if not self.defaults:
@@ -48,8 +88,9 @@ class Snippet:
             external_args = dict()
 
         defaults = self.defaults or dict()
+        snippet = ArgumentTagProcessor.clean_string(self.snippet, interpolation=True)
 
-        return self.snippet.format(**{**defaults, **external_args})
+        return snippet.format(**{**defaults, **external_args})
 
 
 # todo: trim everything
@@ -68,7 +109,6 @@ class SnippetDto(BaseModel):
             data['tags'] = Validators.trim_tags(data.get('tags'))
 
         super(SnippetDto, self).__init__(**data)
-
 
     def to_entity(self) -> Snippet:
         return Snippet(

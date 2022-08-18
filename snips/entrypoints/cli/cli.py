@@ -6,8 +6,9 @@ import typer
 from rich import print as rich_print
 
 import snips.domain as dm
-from .utils import bootstrap, dto_from_prompt, prepare_command, parse_dict
+from .utils import bootstrap, dto_from_prompt, prepare_command, read_file, parse_dict
 from .config import app as config_app
+
 
 app = bootstrap()
 tags_app = typer.Typer()
@@ -30,26 +31,28 @@ def ls():
     app.console_logger.log_snippets(*result)
 
 
+@tags_app.command('get')
+def tags_get(tags: List[str], mode: dm.TagMatchingMode = dm.TagMatchingMode.any):
+    """Search snippets by tags"""
+    result = app.repository.get_by_tags(tags, mode)
+    app.console_logger.log_snippets(*result)
+
+
 @app.command()
 def get(alias: str,
         raw: bool = typer.Option(False, help="Flag whether to use interpolate snippet with defaults or prompt")):
     """Copy snippet value into clipboard"""
     snippet = app.repository.get_by_id(alias)
 
-    if not raw:
+    cmd = snippet.snippet
+    if snippet.get_arguments() and not raw:
         cmd = prepare_command(snippet)
-    else:
-        cmd = snippet.snippet
 
     pyperclip.copy(cmd)
     rich_print(f"[green]'{cmd}'[/green] copied!")
 
 
-@tags_app.command('get')
-def tags_get(tags: List[str], mode: dm.TagMatchingMode = dm.TagMatchingMode.any):
-    """Search snippets by tags"""
-    result = app.repository.get_by_tags(tags, mode)
-    app.console_logger.log_snippets(*result)
+"""ls <@arg>directory</@arg>  """
 
 
 # /QUERIES
@@ -63,9 +66,16 @@ def delete(alias: str):
 
 
 @app.command()
-def add():
+def add(file: str = typer.Option(None, help="Read snippet from file")):
     """Create new snippet"""
-    dto = dto_from_prompt()
+    snippet = None
+    if file is not None:
+        app.console_logger.print('Reading snippet content from file: {} ...'.format(file))
+        snippet = read_file(file, 'utf-8')
+        app.console_logger.print('File content: \n')
+        app.console_logger.print(snippet)
+
+    dto = dto_from_prompt(snippet=snippet)
     e = app.service.create(dto)
     app.console_logger.log_snippets(e)
 
@@ -102,7 +112,7 @@ def run(alias: str,
         args: str = typer.Option(None,
                                  help="Provide arguments for snippet execution. This will override default arguments"),
         pa: str = typer.Option("", help="Additional arguments that will be appended to the end of a snippet")):
-    """Execute snippet in your os"""
+    """Execute snippet in your OS"""
     snippet = app.repository.get_by_id(alias)
     cmd = prepare_command(snippet, parse_dict(args))
     os.system(cmd + " " + pa)

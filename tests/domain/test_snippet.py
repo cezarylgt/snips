@@ -2,13 +2,23 @@ import pytest
 from pydantic import ValidationError
 
 import snips.domain as dm
+import snips.domain.snippet as sn
+
+
+class TestArgumentTagProcessor:
+
+    def test_remove_arg_tag(self):
+        string = f'{sn.ArgumentTagProcessor.OPENING_TAG} argument {sn.ArgumentTagProcessor.CLOSING_TAG} -f {sn.ArgumentTagProcessor.OPENING_TAG} second {sn.ArgumentTagProcessor.CLOSING_TAG}'
+        result = sn.ArgumentTagProcessor.clean_string(string)
+        assert result == 'argument -f second'
 
 
 @pytest.mark.unit
 class TestSnippet:
 
     def _example(self) -> dm.Snippet:
-        return dm.Snippet('ex', 'execute {filename} -p {directory} -f {directory}', 'does something',
+        return dm.Snippet('ex', 'execute <@arg>filename  </@arg> -p <@arg>directory</@arg> -f <@arg>directory</@arg>',
+                          'does something',
                           defaults={'filename': '/home/.vimrc', 'directory': 'home'}
                           )
 
@@ -97,4 +107,3 @@ class TestCreateSnippetDto:
             tags=['python   ', ' bash']
         )
         assert set(request.tags) == {'python', 'bash'}
-
