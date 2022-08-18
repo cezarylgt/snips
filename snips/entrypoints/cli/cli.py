@@ -11,8 +11,8 @@ from .config import app as config_app
 
 app = bootstrap()
 tags_app = typer.Typer()
-app.add_typer(tags_app, name='tags')
-app.add_typer(config_app, name='config')
+app.add_typer(tags_app, name='tags', help="Manage tags")
+app.add_typer(config_app, name='config', help="Manage configuration")
 
 
 # QUERIES
