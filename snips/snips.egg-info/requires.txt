@@ -1,0 +1,7 @@
+typer
+pyperclip
+rich
+tinydb
+pydantic
+python-dotenv
+pyyaml

@@ -1,4 +1,6 @@
-from snips.entrypoints.cli import app as app
+from snips.entrypoints.cli import app
+
+run = app
 
 
 if __name__ == '__main__':
