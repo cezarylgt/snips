@@ -107,3 +107,12 @@ class TestCreateSnippetDto:
             tags=['python   ', ' bash']
         )
         assert set(request.tags) == {'python', 'bash'}
+
+    def test_drop_empty_tags_after_init(self):
+        request = dm.SnippetDto(
+            alias='alias',
+            snippet='bla bla',
+            desc='',
+            tags=['python   ', ' bash', '', '']
+        )
+        assert set(request.tags) == {'python', 'bash'}

@@ -7,6 +7,7 @@ from rich.console import Console
 from rich.table import Table
 
 import snips.domain as dm
+from snips.settings import CONFIG
 
 
 class IConsoleLogger:
@@ -41,6 +42,12 @@ class JsonConsoleLogger(IConsoleLogger):
         rich_print(snp.dict())
 
 
+class Styles:
+    header = CONFIG.HEADER_STYLE
+    snippet = CONFIG.SNIPPET_STYLE
+    text = CONFIG.TEXT_STYLE
+
+
 class PrettyConsoleLogger(IConsoleLogger):
 
     def _log_snippet(self, snp: dm.Snippet) -> None:
@@ -52,10 +59,10 @@ class PrettyConsoleLogger(IConsoleLogger):
     def _convert(self, snp: dm.Snippet) -> str:
         # return f"""[bold blue]{snp.id}[/bold blue] [green]{snp.snippet}[/green] [yellow]{snp.desc}[/yellow]"""
         return rf"""
-[bold blue]Alias:[/bold blue] {snp.alias}
-[yellow]Description:[/yellow] {snp.desc}
-[yellow]Tags[/yellow]: {' '.join(snp.tags or [])}
-[green]Snippet:[/green] {snp.snippet}"""
+[{Styles.header}]Alias:[/{Styles.header}] [{Styles.text}]{snp.alias}[/{Styles.text}]
+[{Styles.header}]Description:[/{Styles.header}] [{Styles.text}]{snp.desc}[/{Styles.text}]
+[{Styles.header}]Tags[/{Styles.header}]: [{Styles.text}]{' '.join(snp.tags or [])} [/{Styles.text}]
+[{Styles.header}]Snippet:[/{Styles.header}] [{Styles.snippet}]{snp.snippet}[/{Styles.snippet}]"""
 
 
 class TableConsoleLogger(IConsoleLogger):
@@ -65,9 +72,9 @@ class TableConsoleLogger(IConsoleLogger):
         self._console = Console()
 
     def _log_snippet(self, *snps: dm.Snippet) -> None:
-        table = Table(*[f"[blue]{f}[/blue]" for f in self._FIELD_ORDER])
+        table = Table(*[f"[{Styles.header}]{f}[/{Styles.header}]" for f in self._FIELD_ORDER])
         for snp in snps:
-            values = [str(snp.dict()[field]) for field in self._FIELD_ORDER]
+            values = [f"[{Styles.text}]{str(snp.dict()[field])}[/{Styles.text}]" for field in self._FIELD_ORDER]
             table.add_row(*values)
         self._console.print(table)
 

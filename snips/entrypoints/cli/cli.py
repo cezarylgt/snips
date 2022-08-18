@@ -49,7 +49,7 @@ def get(alias: str,
         cmd = prepare_command(snippet)
 
     pyperclip.copy(cmd)
-    rich_print(f"[green]'{cmd}'[/green] copied!")
+    rich_print(f"[green]'{cmd}'[/green]\n copied!")
 
 
 """ls <@arg>directory</@arg>  """
@@ -90,7 +90,6 @@ def edit(alias: str,
          ):
     """Update existing snippet"""
     snippet = app.repository.get_by_id(alias)
-    app.console_logger.log_snippets(snippet)
 
     if any((a, s, desc, tags, defaults)):
         dto = dm.SnippetDto(

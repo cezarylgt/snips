@@ -3,7 +3,7 @@ from typing import List
 from snips.domain import ISnippetRepository, Snippet, TagMatchingMode
 import snips.domain.exceptions as ex
 from tinydb import TinyDB, Query
-import snips.settings as settings
+from snips.settings import CONFIG
 
 
 def deserialize(di: dict) -> Snippet:
@@ -18,9 +18,9 @@ def deserialize_many(dis: List[dict]) -> List[Snippet]:
 
 class TinyDbSnipperRepository(ISnippetRepository):
 
-    def __init__(self, path: str = settings.DB_URI):
+    def __init__(self, path: str = CONFIG.DB_URI):
         self.db = TinyDB(path)
-        self.table = self.db.table(settings.SNIPPET_TABLE)
+        self.table = self.db.table("Snippets")
 
         self._query = Query()
 

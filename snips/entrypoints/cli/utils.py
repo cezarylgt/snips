@@ -6,7 +6,8 @@ from snips.domain.service import SnippetService
 from snips.infrastructure import IConsoleLogger
 from snips.ioc import get_ioc
 
-EMOJI = ":question:"
+_EMOJI = ":question:"
+_TAG_SEPARATOR = ' '
 
 
 class Snips(typer.Typer):
@@ -26,21 +27,21 @@ def bootstrap() -> Snips:
 
 
 def dto_from_prompt(df: dm.Snippet = None, snippet: str = None) -> dm.SnippetDto:
-    alias = Prompt.ask(f"{EMOJI} Alias", default=df.alias if df else None)
+    alias = Prompt.ask(f"{_EMOJI} Alias", default=df.alias if df else None)
     dm.Validators.alias_cannot_have_white_chars(alias)
 
     if not snippet:
-        snippet = Prompt.ask(f"{EMOJI} Snippet", default=df.snippet if df else None)
+        snippet = Prompt.ask(f"{_EMOJI} Snippet", default=df.snippet if df else None)
         dm.Validators.snippet_cannot_be_empty(snippet)
 
-    desc = Prompt.ask(f"{EMOJI} Description", default=df.desc if df else None)
-    input_tags = Prompt.ask(f"{EMOJI} Tags (separeted by ',') ",
-                            default=', '.join(df.tags) if df else None
+    desc = Prompt.ask(f"{_EMOJI} Description", default=df.desc if df else None)
+    input_tags = Prompt.ask(f"{_EMOJI} Tags (space separated) ",
+                            default=_TAG_SEPARATOR.join(df.tags) if df else None
                             )
-    defaults = Prompt.ask(f"{EMOJI} Default values for provided arguments", default=df.defaults if df else None)
+    defaults = Prompt.ask(f"{_EMOJI} Default values for provided arguments", default=df.defaults if df else None)
 
     if isinstance(input_tags, str):
-        input_tags = [t.strip() for t in input_tags.split(',')]
+        input_tags = [t.strip() for t in input_tags.split(_TAG_SEPARATOR)]
 
     return dm.SnippetDto(
         alias=alias,
@@ -62,7 +63,7 @@ def prepare_command(snp: dm.Snippet, provided_arguments: dict = None) -> str:
         print("Provide missing snippet arguments:")
 
         for arg in missing_args:
-            args[arg] = Prompt.ask(f"{EMOJI} {arg}")
+            args[arg] = Prompt.ask(f"{_EMOJI} {arg}")
     return snp.parse_command(args)
 
 

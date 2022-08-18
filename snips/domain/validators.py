@@ -18,4 +18,7 @@ class Validators:
 
     @staticmethod
     def trim_tags(tags: List[str]):
-        return [t.strip() for t in tags]
+
+        return [t.strip() for t in tags if t]
+
+
