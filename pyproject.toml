@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+
+markers = [
+    "unit: unit test",
+    "e2e: e2e test"
+]

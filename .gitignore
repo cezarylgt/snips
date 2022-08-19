@@ -4,3 +4,5 @@ dist/
 build/
 pytest-cahe/
 **/.idea/**
+trash.py
+.coverage

@@ -132,7 +132,6 @@ class TestCli:
         assert modified.desc == 'edited description'
         assert modified.tags == ['sql']
 
-    def test_run(self):
-        result = runner.invoke(app, ['run', 'test1', '--args directory=.'])
-        print(result.stdout)
+    def test_run_with_rpovided_arg(self):
+        result = runner.invoke(app, ['run', 'test1', '--args', 'directory=.'])
         assert result.exit_code == 0

@@ -2,13 +2,17 @@
 directory = coverage
 
 [run]
+branch = True
 omit =
     venv/*
     */tests/*
     */__init__.py
+    setup.py
+    */app.py
 
 [report]
 exclude_lines =
     if __name__ == .__main__.:
+    @(abc\.)?abstractmethod
 
-# python - m pytest --cov=. -v -m unit --cov-report=html --cov=branch
+# python - m pytest --cov=. -v --cov-report=html --cov=branch
