@@ -15,7 +15,7 @@ class SnippetService(abc.ABC):
                 raise ex.AliasAlreadyExists.with_message(request.alias)
         return self.repository.save(request.to_entity())
 
-    def update(self, request: SnippetDto) -> Snippet:
-        snippet = self.repository.get_by_id(request.alias)
+    def update(self, request: SnippetDto, alias: str = None) -> Snippet:
+        snippet = self.repository.get_by_id(alias or request.alias)
         request.update_entity(snippet)
         return self.repository.save(snippet)

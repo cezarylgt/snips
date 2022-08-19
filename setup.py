@@ -18,7 +18,7 @@ setup(
     include_package_data=True,
     entry_points='''
         [console_scripts]
-        snp=snips.app:run
+        snp=snips.app:app
     '''
 )
 

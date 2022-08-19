@@ -1,2 +1,2 @@
 [console_scripts]
-snp = snips.app:run
+snp = snips.app:app

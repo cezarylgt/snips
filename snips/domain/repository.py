@@ -36,7 +36,12 @@ class ISnippetRepository:
     @abc.abstractmethod
     def delete_by_id(self, id: str) -> None: ...
 
+    @abc.abstractmethod
     def exists(self, alias: str): ...
+
+    @abc.abstractmethod
+    def remove_all(self) -> None: ...
+
 
 class IConfigurationRepository:
 

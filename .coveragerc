@@ -1,0 +1,14 @@
+[html]
+directory = coverage
+
+[run]
+omit =
+    venv/*
+    */tests/*
+    */__init__.py
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:
+
+# python - m pytest --cov=. -v -m unit --cov-report=html --cov=branch

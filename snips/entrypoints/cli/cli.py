@@ -6,13 +6,30 @@ import typer
 from rich import print as rich_print
 
 import snips.domain as dm
-from .utils import bootstrap, dto_from_prompt, prepare_command, read_file, parse_dict, prepare_command_with_args
+from .utils import bootstrap, dto_from_prompt, prepare_command, read_file, parse_dict, prepare_command_with_args, \
+    parse_tags
 from .config import app as config_app
 
 app = bootstrap()
 tags_app = typer.Typer()
 app.add_typer(tags_app, name='tags', help="Manage tags")
 app.add_typer(config_app, name='config', help="Manage configuration")
+
+
+class LongArgs:
+    alias = '--alias'
+    snippet = '--snippet'
+    desc = '--desc'
+    tags = '--tags'
+    defaults = '--defaults'
+
+
+class ShortArgs:
+    alias = '-a'
+    snippet = '-s'
+    desc = '-d'
+    tags = '-t'
+    defaults = '-df'
 
 
 # QUERIES
@@ -65,36 +82,51 @@ def get(alias: str,
 def delete(alias: str):
     """Remove snippet """
     app.repository.delete_by_id(alias)
-    rich_print(f"Snippet: [blue]{alias}[/blue] deleted")
+    rich_print(f"[blue]{alias}[/blue] deleted")
 
 
 @app.command()
-def add(file: str = typer.Option(None, '--file', '-f', help="Read snippet from file")):
+def add(
+        file: str = typer.Option(None, '--file', '-f', help="Read snippet from file"),
+        a: str = typer.Option(None, LongArgs.alias, ShortArgs.alias, help="set alias"),
+        s: str = typer.Option(None, LongArgs.snippet, ShortArgs.snippet, help="set snippet"),
+        desc: str = typer.Option(None, LongArgs.desc, ShortArgs.desc, help="set description"),
+        tags: List[str] = typer.Option([], LongArgs.tags, ShortArgs.tags, help="set tags"),
+        defaults: str = typer.Option(None, LongArgs.defaults, ShortArgs.defaults, help="Set default arguments")
+):
     """Create new snippet"""
-    snippet = None
+    snippet_content = None
     if file is not None:
         app.console_logger.print('Reading snippet content from file: {} ...'.format(file))
-        snippet = read_file(file, 'utf-8')
+        snippet_content = read_file(file, 'utf-8')
         app.console_logger.print('File content: \n')
-        app.console_logger.print(snippet)
+        app.console_logger.print(snippet_content)
 
-    dto = dto_from_prompt(snippet=snippet)
+    if any((a, s, desc, tags, defaults)):
+        dto = dm.SnippetDto(
+            alias=a,
+            snippet=s or snippet_content,
+            desc=desc,
+            tags=parse_tags(tags) if tags else None,
+            defaults=parse_dict(defaults) if defaults else None
+        )
+    else:
+        dto = dto_from_prompt(snippet_content)
+    print('created dto', dto)
     e = app.service.create(dto)
     app.console_logger.log_snippets(e)
 
 
 @app.command()
 def edit(alias: str,
-         a: str = typer.Option(None, '--alias', '-a', help="set alias"),
-         s: str = typer.Option(None, '--snippet', '-s', help="set snippet"),
-         desc: str = typer.Option(None, '--desc', '-d', help="set description"),
-         tags: List[str] = typer.Option([], '--tags', '-t', help="set tags"),
-         defaults: str = typer.Option(None, '--defaults', '-df', help="Set default arguments")
+         a: str = typer.Option(None, LongArgs.alias, ShortArgs.alias, help="set alias"),
+         s: str = typer.Option(None, LongArgs.snippet, ShortArgs.snippet, help="set snippet"),
+         desc: str = typer.Option(None, LongArgs.desc, ShortArgs.desc, help="set description"),
+         tags: List[str] = typer.Option([], LongArgs.tags, ShortArgs.tags, help="set tags"),
+         defaults: str = typer.Option(None, LongArgs.defaults, ShortArgs.defaults, help="Set default arguments")
          ):
     """Update existing snippet"""
     snippet = app.repository.get_by_id(alias)
-
-    print(defaults)
 
     if any((a, s, desc, tags, defaults)):
         dto = dm.SnippetDto(
@@ -106,9 +138,8 @@ def edit(alias: str,
         )
     else:
         dto = dto_from_prompt(snippet)
-    print(dto)
 
-    e = app.service.update(dto)
+    e = app.service.update(dto, alias=snippet.alias)
     app.console_logger.log_snippets(e)
 
 

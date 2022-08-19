@@ -39,6 +39,11 @@ tests/../.env
 tests/../snp.sh
 tests/domain/__init__.py
 tests/domain/test_snippet.py
+tests/domain/entrypoints/__init__.py
+tests/domain/entrypoints/cli/__init__.py
+tests/domain/entrypoints/cli/test_cli.py
+tests/domain/entrypoints/cli/test_config.py
+tests/domain/entrypoints/cli/test_utils.py
 tests/infrastructure/__init__.py
 tests/infrastructure/repository/__init__.py
 tests/infrastructure/repository/test_tinydb_repository.py

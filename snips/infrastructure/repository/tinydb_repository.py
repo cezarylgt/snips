@@ -49,3 +49,6 @@ class TinyDbSnipperRepository(ISnippetRepository):
 
     def exists(self, alias: str) -> bool:
         return bool(self.table.get(self._query.alias == alias))
+
+    def remove_all(self) -> None:
+        self.db.drop_table('Snippets')

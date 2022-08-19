@@ -12,6 +12,11 @@ class TestArgumentTagProcessor:
         result = sn.ArgumentTagProcessor.clean_string(string)
         assert result == 'argument -f second'
 
+    def test_remove_arg_tags_with_nested_qoutes(self):
+        # string = f'find {sn.ArgumentTagProcessor.OPENING_TAG}dir{sn.ArgumentTagProcessor.CLOSING_TAG} -f {sn.ArgumentTagProcessor.OPENING_TAG} second {sn.ArgumentTagProcessor.CLOSING_TAG}'
+        string = "find <@arg>dir</@arg> -name '*.<@arg>ext</@arg>'"
+        result = sn.ArgumentTagProcessor.clean_string(string, interpolation=True)
+
 
 @pytest.mark.unit
 class TestSnippet:

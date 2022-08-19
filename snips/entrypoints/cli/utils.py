@@ -1,3 +1,5 @@
+from typing import List, Any
+
 import typer
 from rich.prompt import Prompt
 
@@ -22,8 +24,14 @@ def bootstrap() -> Snips:
     cli.repository = ioc.repository
     cli.console_logger = ioc.console_logger
     cli.service = ioc.service
-    cli.repository.save(dm.Snippet('drop-db', 'DROP DATABASE', 'drops database in sql server engine', tags=['sql']))
     return cli
+
+
+def parse_tags(tags: str | Any) -> List[str]:
+    print('tags type', type(tags))
+    if isinstance(tags, str):
+        return [t.strip() for t in tags.split(_TAG_SEPARATOR)]
+    return tags
 
 
 def dto_from_prompt(df: dm.Snippet = None, snippet: str = None) -> dm.SnippetDto:
@@ -40,14 +48,11 @@ def dto_from_prompt(df: dm.Snippet = None, snippet: str = None) -> dm.SnippetDto
                             )
     defaults = Prompt.ask(f"{_EMOJI} Default values for provided arguments", default=df.defaults if df else None)
 
-    if isinstance(input_tags, str):
-        input_tags = [t.strip() for t in input_tags.split(_TAG_SEPARATOR)]
-
     return dm.SnippetDto(
         alias=alias,
         snippet=snippet,
         desc=desc,
-        tags=input_tags,
+        tags=parse_tags(input_tags),
         defaults=parse_dict(defaults)
     )
 
@@ -81,16 +86,14 @@ def parse_dict(string: str) -> dict:
     where ',' separates dict items, left side of '=' is key, and right side of '=' is value.
     """
 
-    print('PARSING STRING,', string)
-    if string is None:
-        return dict()
+    if not string:
+        return None
 
     str_entries = string.split(',')
     di = dict()
     for sentry in str_entries:
         key, value = sentry.split('=')
         di[key] = value
-    print('RETURNING STRING', di)
     return di
 
 
