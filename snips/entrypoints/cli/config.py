@@ -1,9 +1,9 @@
 import typer
-import snips.settings as settings
 from dotenv import dotenv_values, set_key
+from rich import print
+
+import snips.settings as settings
 from snips.infrastructure.console_logger import ConsoleLoggerProviderEnum
-from rich import print, print_json
-from rich.pretty import pprint
 
 
 def load_configuration() -> dict:

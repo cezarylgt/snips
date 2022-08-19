@@ -39,7 +39,8 @@ def tags_get(tags: List[str], mode: dm.TagMatchingMode = dm.TagMatchingMode.any)
 
 @app.command()
 def get(alias: str,
-        raw: bool = typer.Option(False, help="Flag whether to use interpolate snippet with defaults or prompt"),
+        raw: bool = typer.Option(False, '--raw', '-r',
+                                 help="Flag whether to use interpolate snippet with defaults or prompt"),
         defaults: bool = typer.Option(True, help="Whether to auo parse command with default arguments")
         ):
     """Copy snippet value into clipboard"""
@@ -68,7 +69,7 @@ def delete(alias: str):
 
 
 @app.command()
-def add(file: str = typer.Option(None, help="Read snippet from file")):
+def add(file: str = typer.Option(None, '--file', '-f', help="Read snippet from file")):
     """Create new snippet"""
     snippet = None
     if file is not None:
@@ -84,11 +85,11 @@ def add(file: str = typer.Option(None, help="Read snippet from file")):
 
 @app.command()
 def edit(alias: str,
-         a: str = typer.Option(None, help="set alias"),
-         s: str = typer.Option(None, help="set snippet"),
-         desc: str = typer.Option(None, help="set description"),
-         tags: List[str] = typer.Option([], help="set tags"),
-         defaults: str = typer.Option(None, help="Set default arguments")
+         a: str = typer.Option(None, '--alias', '-a', help="set alias"),
+         s: str = typer.Option(None, '--snippet', '-s', help="set snippet"),
+         desc: str = typer.Option(None, '--desc', '-d', help="set description"),
+         tags: List[str] = typer.Option([], '--tags', '-t', help="set tags"),
+         defaults: str = typer.Option(None, '--defaults', '-df', help="Set default arguments")
          ):
     """Update existing snippet"""
     snippet = app.repository.get_by_id(alias)
@@ -113,9 +114,10 @@ def edit(alias: str,
 
 @app.command()
 def run(alias: str,
-        args: str = typer.Option(None,
+        args: str = typer.Option(None, '--args', '-a',
                                  help="Provide arguments for snippet execution. This will override default arguments"),
-        pa: str = typer.Option("", help="Additional arguments that will be appended to the end of a snippet")):
+        pa: str = typer.Option("", '--post-args', '-pa',
+                               help="Additional arguments that will be appended to the end of a snippet")):
     """Execute snippet in your OS"""
     snippet = app.repository.get_by_id(alias)
     cmd = prepare_command(snippet, parse_dict(args))
