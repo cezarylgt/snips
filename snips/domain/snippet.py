@@ -93,7 +93,6 @@ class Snippet:
         return snippet.format(**{**defaults, **external_args})
 
 
-# todo: trim everything
 class SnippetDto(BaseModel):
     alias: str
     snippet: str

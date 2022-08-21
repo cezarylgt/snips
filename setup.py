@@ -22,3 +22,8 @@ setup(
     '''
 )
 
+
+# todo:
+# ls with search option
+# console logger - log with style for user
+# templates

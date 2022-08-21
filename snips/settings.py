@@ -16,7 +16,7 @@ class ConfigEnum(str, Enum):
     HEADER_STYLE = 'HEADER_STYLE'
     SNIPPET_STYLE = 'SNIPPET_STYLE'
     TEXT_STYLE = 'TEXT_STYLE'
-
+    THEME = 'THEME'
     @classmethod
     def list(cls):
         return list(map(lambda c: c.value, cls))
@@ -30,6 +30,7 @@ class Configuration:
     HEADER_STYLE: str = 'yellow'
     SNIPPET_STYLE: str = 'green'
     TEXT_STYLE: str = 'dark_orange'
+    THEME : str = 'default'
 
     @classmethod
     def from_environ(cls):

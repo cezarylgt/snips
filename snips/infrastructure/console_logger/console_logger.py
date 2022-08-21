@@ -7,6 +7,7 @@ from rich.console import Console
 from rich.table import Table
 
 import snips.domain as dm
+from snips.infrastructure.console_logger.themes import Styles
 from snips.settings import CONFIG
 
 
@@ -41,12 +42,6 @@ class JsonConsoleLogger(IConsoleLogger):
 
     def _log_snippet(self, snp: dm.Snippet) -> None:
         rich_print(snp.dict())
-
-
-class Styles:
-    header = CONFIG.HEADER_STYLE
-    snippet = CONFIG.SNIPPET_STYLE
-    text = CONFIG.TEXT_STYLE
 
 
 def pretty_format(snp: dm.Snippet) -> List[str]:
