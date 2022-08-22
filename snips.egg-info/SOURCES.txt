@@ -22,6 +22,8 @@ snips/domain/repository.py
 snips/domain/service.py
 snips/domain/snippet.py
 snips/domain/validators.py
+snips/domain/themes/__init__.py
+snips/domain/themes/themes.py
 snips/entrypoints/__init__.py
 snips/entrypoints/cli/__init__.py
 snips/entrypoints/cli/cli.py
@@ -30,7 +32,6 @@ snips/entrypoints/cli/utils.py
 snips/infrastructure/__init__.py
 snips/infrastructure/console_logger/__init__.py
 snips/infrastructure/console_logger/console_logger.py
-snips/infrastructure/console_logger/themes.py
 snips/infrastructure/repository/__init__.py
 snips/infrastructure/repository/tinydb_repository.py
 snips/ioc/__init__.py

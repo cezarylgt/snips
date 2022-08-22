@@ -24,9 +24,9 @@ def repository_factory(provider: DbProvider = settings.CONFIG.DB_PROVIDER):
 @dataclass
 class IocContainer:
     repository: ISnippetRepository
+    theme_repository: IThemeRepository
     console_logger: infra.IConsoleLogger
     service: SnippetService
-    theme_repository: IThemeRepository
 
 
 def get_ioc() -> IocContainer:
@@ -34,7 +34,7 @@ def get_ioc() -> IocContainer:
     themes = TinyDbThemeRepository(settings.THEMES_URI)
     return IocContainer(
         repository,
-        ConsoleLoggerFactory.create(settings.CONFIG.FORMAT),
+        themes,
+        ConsoleLoggerFactory.create(settings.CONFIG.FORMAT, themes.get_by_id(settings.CONFIG.THEME)),
         SnippetService(repository),
-        themes
     )

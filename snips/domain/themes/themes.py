@@ -80,6 +80,3 @@ class TinyDbThemeRepository(IThemeRepository):
             return Theme(**result)
         raise ThemeNotFound
 
-
-def get_current_theme() -> Theme:
-    return TinyDbThemeRepository().get_by_id(settings.CONFIG.THEME)

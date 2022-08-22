@@ -7,10 +7,13 @@ from rich.console import Console
 from rich.table import Table
 
 import snips.domain as dm
-from snips.domain.themes.themes import Theme, get_current_theme
+from snips.domain.themes.themes import Theme
 
 
 class IConsoleLogger:
+
+    def __init__(self, theme: Theme):
+        self._theme = theme
 
     def log_snippets(self, *snps: dm.Snippet) -> None:
         for snp in snps:
@@ -53,9 +56,6 @@ def pretty_format(snp: dm.Snippet, theme: Theme) -> List[str]:
 
 class PrettyConsoleLogger(IConsoleLogger):
 
-    def __init__(self, theme: Theme = get_current_theme()):
-        self._theme = theme
-
     def _log_snippet(self, snp: dm.Snippet) -> None:
         rich_print(self._convert(snp))
 
@@ -82,8 +82,8 @@ class TableConsoleLogger(IConsoleLogger):
     _FIELD_ORDER = ['alias', 'snippet', 'defaults', 'tags', 'desc']
 
     def __init__(self, theme: Theme):
+        super(TableConsoleLogger, self).__init__(theme)
         self._console = Console()
-        self._theme = theme
 
     def _log_snippet(self, *snps: dm.Snippet) -> None:
         table = Table(*[f"[{self._theme.header}]{f}[/{self._theme.header}]" for f in self._FIELD_ORDER],
@@ -113,5 +113,5 @@ class ConsoleLoggerFactory:
     }
 
     @staticmethod
-    def create(logger_provider: ConsoleLoggerProviderEnum) -> IConsoleLogger:
-        return ConsoleLoggerFactory._mapping[logger_provider]()
+    def create(logger_provider: ConsoleLoggerProviderEnum, theme: Theme) -> IConsoleLogger:
+        return ConsoleLoggerFactory._mapping[logger_provider](theme)
