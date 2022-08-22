@@ -1,6 +1,6 @@
 import pytest
 
-from snips.infrastructure.console_logger.themes import Theme
+from snips.domain.themes.themes import Theme
 
 @pytest.mark.unit
 class TestTheme:

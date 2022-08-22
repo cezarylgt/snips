@@ -7,8 +7,7 @@ from rich.console import Console
 from rich.table import Table
 
 import snips.domain as dm
-from snips.infrastructure.console_logger.themes import Styles, Theme, get_current_theme
-from snips.settings import CONFIG
+from snips.domain.themes.themes import Theme, get_current_theme
 
 
 class IConsoleLogger:
@@ -44,24 +43,24 @@ class JsonConsoleLogger(IConsoleLogger):
         rich_print(snp.dict())
 
 
-def pretty_format(snp: dm.Snippet) -> List[str]:
-    return [rf"[{Styles.text}]{snp.alias}[/{Styles.text}]",
-            rf"[{Styles.snippet}]{snp.snippet}[/{Styles.snippet}]",
-            rf"[{Styles.text}]{snp.defaults}[/{Styles.text}]",
-            rf"[{Styles.text}]{' '.join(snp.tags or [])} [/{Styles.text}]",
-            rf"[{Styles.text}]{snp.desc}[/{Styles.text}]"]
+def pretty_format(snp: dm.Snippet, theme: Theme) -> List[str]:
+    return [rf"[{theme.text}]{snp.alias}[/{theme.text}]",
+            rf"[{theme.snippet}]{snp.snippet}[/{theme.snippet}]",
+            rf"[{theme.text}]{snp.defaults}[/{theme.text}]",
+            rf"[{theme.text}]{' '.join(snp.tags or [])} [/{theme.text}]",
+            rf"[{theme.text}]{snp.desc}[/{theme.text}]"]
 
 
 class PrettyConsoleLogger(IConsoleLogger):
 
     def __init__(self, theme: Theme = get_current_theme()):
-        self.theme = theme
+        self._theme = theme
 
     def _log_snippet(self, snp: dm.Snippet) -> None:
         rich_print(self._convert(snp))
 
     def print(self, o: Any):
-        rich_print(f'[{Styles.text}]{o}[/{Styles.text}]')
+        rich_print(f'[{self._theme.text}]{o}[/{self._theme.text}]')
 
     def _convert(self, snp: dm.Snippet) -> str:
         # horizontal
@@ -69,11 +68,11 @@ class PrettyConsoleLogger(IConsoleLogger):
         #
         # veritical
         return rf"""
-    [{self.theme.header}]Alias:[/{self.theme.header}] [{self.theme.alias}]{snp.alias}[/{self.theme.alias}]
-    [{self.theme.header}]Snippet:[/{self.theme.header}] [{self.theme.snippet}]{snp.snippet}[/{self.theme.snippet}]
-    [{self.theme.header}]Defaults:[/{self.theme.header}] [{self.theme.defaults}]{snp.defaults or ''}[/{self.theme.defaults}]
-    [{self.theme.header}]Tags[/{self.theme.header}]: [{self.theme.tags}]{' '.join(snp.tags or [])} [/{self.theme.tags}]
-    [{self.theme.header}]Description:[/{self.theme.header}] [{self.theme.desc}]{snp.desc}[/{self.theme.desc}]"""
+    [{self._theme.header}]Alias:[/{self._theme.header}] [{self._theme.alias}]{snp.alias}[/{self._theme.alias}]
+    [{self._theme.header}]Snippet:[/{self._theme.header}] [{self._theme.snippet}]{snp.snippet}[/{self._theme.snippet}]
+    [{self._theme.header}]Defaults:[/{self._theme.header}] [{self._theme.defaults}]{snp.defaults or ''}[/{self._theme.defaults}]
+    [{self._theme.header}]Tags[/{self._theme.header}]: [{self._theme.tags}]{' '.join(snp.tags or [])} [/{self._theme.tags}]
+    [{self._theme.header}]Description:[/{self._theme.header}] [{self._theme.desc}]{snp.desc}[/{self._theme.desc}]"""
 
     # fields only
     # return rf""" [{Styles.text}]{snp.alias}[/{Styles.text}] [{Styles.snippet}]{snp.snippet}[/{Styles.snippet}]  [{Styles.text}]{snp.defaults}[/{Styles.text}] [{Styles.text}]{' '.join(snp.tags or [])} [/{Styles.text}] [{Styles.text}]{snp.desc}[/{Styles.text}]"""
@@ -82,17 +81,16 @@ class PrettyConsoleLogger(IConsoleLogger):
 class TableConsoleLogger(IConsoleLogger):
     _FIELD_ORDER = ['alias', 'snippet', 'defaults', 'tags', 'desc']
 
-    def __init__(self):
+    def __init__(self, theme: Theme):
         self._console = Console()
+        self._theme = theme
 
     def _log_snippet(self, *snps: dm.Snippet) -> None:
-        table = Table(*[f"[{Styles.header}]{f}[/{Styles.header}]" for f in self._FIELD_ORDER],
+        table = Table(*[f"[{self._theme.header}]{f}[/{self._theme.header}]" for f in self._FIELD_ORDER],
                       box=None
                       )
         for snp in snps:
-            # values = [f"[{Styles.text}]{str(snp.dict()[field])}[/{Styles.text}]" for field in self._FIELD_ORDER]
-
-            table.add_row(*pretty_format(snp))
+            table.add_row(*pretty_format(snp, self._theme))
         self._console.print(table)
 
     def log_snippets(self, *snps: dm.Snippet) -> None:

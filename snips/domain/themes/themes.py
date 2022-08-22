@@ -7,12 +7,6 @@ from snips.settings import CONFIG
 import snips.settings as settings
 
 
-class Styles:
-    header = CONFIG.HEADER_STYLE
-    snippet = CONFIG.SNIPPET_STYLE
-    text = CONFIG.TEXT_STYLE
-
-
 @dataclass
 class Theme:
     name: str
@@ -69,7 +63,7 @@ class IThemeRepository:
     def get_by_id(self, id: str): ...
 
 
-class TinydbThemeRepository(IThemeRepository):
+class TinyDbThemeRepository(IThemeRepository):
 
     def __init__(self, path: str = settings.THEMES_URI):
         self.db = TinyDB(path)
@@ -88,4 +82,4 @@ class TinydbThemeRepository(IThemeRepository):
 
 
 def get_current_theme() -> Theme:
-    return TinydbThemeRepository().get_by_id(settings.CONFIG.THEME)
+    return TinyDbThemeRepository().get_by_id(settings.CONFIG.THEME)

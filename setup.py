@@ -22,7 +22,9 @@ setup(
 )
 
 # todo:
+#   use injector
 #   ls with search option
 #   console logger - loging info (messages to user)
 #   themes:
 #       theme as domain object
+#       theme cli
