@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.table import Table
 
 import snips.domain as dm
-from snips.infrastructure.console_logger.themes import Styles
+from snips.infrastructure.console_logger.themes import Styles, Theme, get_current_theme
 from snips.settings import CONFIG
 
 
@@ -54,6 +54,9 @@ def pretty_format(snp: dm.Snippet) -> List[str]:
 
 class PrettyConsoleLogger(IConsoleLogger):
 
+    def __init__(self, theme: Theme = get_current_theme()):
+        self.theme = theme
+
     def _log_snippet(self, snp: dm.Snippet) -> None:
         rich_print(self._convert(snp))
 
@@ -65,15 +68,15 @@ class PrettyConsoleLogger(IConsoleLogger):
         # return rf"""[{Styles.header}]Alias:[/{Styles.header}] [{Styles.text}]{snp.alias}[/{Styles.text}] [{Styles.header}]Snippet:[/{Styles.header}] [{Styles.snippet}]{snp.snippet}[/{Styles.snippet}] [{Styles.header}]Defaults:[/{Styles.header}] [{Styles.text}]{snp.defaults}[/{Styles.text}] [{Styles.header}]Tags[/{Styles.header}]: [{Styles.text}]{' '.join(snp.tags or [])} [/{Styles.text}] [{Styles.header}]Description:[/{Styles.header}] [{Styles.text}]{snp.desc}[/{Styles.text}]"""
         #
         # veritical
-                return rf"""
-    [{Styles.header}]Alias:[/{Styles.header}] [{Styles.text}]{snp.alias}[/{Styles.text}]
-    [{Styles.header}]Snippet:[/{Styles.header}] [{Styles.snippet}]{snp.snippet}[/{Styles.snippet}]
-    [{Styles.header}]Defaults:[/{Styles.header}] [{Styles.text}]{snp.defaults}[/{Styles.text}]
-    [{Styles.header}]Tags[/{Styles.header}]: [{Styles.text}]{' '.join(snp.tags or [])} [/{Styles.text}]
-    [{Styles.header}]Description:[/{Styles.header}] [{Styles.text}]{snp.desc}[/{Styles.text}]"""
+        return rf"""
+    [{self.theme.header}]Alias:[/{self.theme.header}] [{self.theme.alias}]{snp.alias}[/{self.theme.alias}]
+    [{self.theme.header}]Snippet:[/{self.theme.header}] [{self.theme.snippet}]{snp.snippet}[/{self.theme.snippet}]
+    [{self.theme.header}]Defaults:[/{self.theme.header}] [{self.theme.defaults}]{snp.defaults or ''}[/{self.theme.defaults}]
+    [{self.theme.header}]Tags[/{self.theme.header}]: [{self.theme.tags}]{' '.join(snp.tags or [])} [/{self.theme.tags}]
+    [{self.theme.header}]Description:[/{self.theme.header}] [{self.theme.desc}]{snp.desc}[/{self.theme.desc}]"""
 
-        # fields only
-        # return rf""" [{Styles.text}]{snp.alias}[/{Styles.text}] [{Styles.snippet}]{snp.snippet}[/{Styles.snippet}]  [{Styles.text}]{snp.defaults}[/{Styles.text}] [{Styles.text}]{' '.join(snp.tags or [])} [/{Styles.text}] [{Styles.text}]{snp.desc}[/{Styles.text}]"""
+    # fields only
+    # return rf""" [{Styles.text}]{snp.alias}[/{Styles.text}] [{Styles.snippet}]{snp.snippet}[/{Styles.snippet}]  [{Styles.text}]{snp.defaults}[/{Styles.text}] [{Styles.text}]{' '.join(snp.tags or [])} [/{Styles.text}] [{Styles.text}]{snp.desc}[/{Styles.text}]"""
 
 
 class TableConsoleLogger(IConsoleLogger):
@@ -94,7 +97,6 @@ class TableConsoleLogger(IConsoleLogger):
 
     def log_snippets(self, *snps: dm.Snippet) -> None:
         self._log_snippet(*snps)
-
 
 
 class ConsoleLoggerProviderEnum(str, Enum):

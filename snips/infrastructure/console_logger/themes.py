@@ -1,5 +1,5 @@
 import abc
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 from tinydb import TinyDB, Query
 
@@ -44,6 +44,24 @@ class Theme:
     def defaults(self):
         return self._defaults or self.text
 
+    def dict(self) -> dict:
+        return asdict(self)
+
+
+class ThemeNotFound(Exception):
+    pass
+
+
+DEFAULT_THEME = Theme(
+    name='default',
+    header='blue',
+    text='green',
+    _snippet='dark_orange',
+    _alias='magenta',
+    _desc='yellow'
+
+)
+
 
 class IThemeRepository:
 
@@ -53,15 +71,21 @@ class IThemeRepository:
 
 class TinydbThemeRepository(IThemeRepository):
 
-    def __init__(self, path: str):
+    def __init__(self, path: str = settings.THEMES_URI):
         self.db = TinyDB(path)
         self.table = self.db.table('themes')
 
         self._query = Query()
 
     def get_by_id(self, id: str):
-        self.table.get(self._query)
+        if id == 'default':
+            return DEFAULT_THEME
+
+        result = self.table.get(self._query.name == id)
+        if result:
+            return Theme(**result)
+        raise ThemeNotFound
 
 
-def get_theme() -> Theme:
-    settings.CONFIG.THEME
+def get_current_theme() -> Theme:
+    return TinydbThemeRepository().get_by_id(settings.CONFIG.THEME)

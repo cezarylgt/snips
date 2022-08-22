@@ -1,6 +1,5 @@
 from setuptools import setup, find_packages
 
-
 setup(
     name='snips',
     packages=find_packages(),
@@ -22,8 +21,8 @@ setup(
     '''
 )
 
-
 # todo:
-# ls with search option
-# console logger - log with style for user
-# templates
+#   ls with search option
+#   console logger - loging info (messages to user)
+#   themes:
+#       theme as domain object

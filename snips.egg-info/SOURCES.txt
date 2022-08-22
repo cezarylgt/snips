@@ -1,5 +1,6 @@
 .env
 README.md
+pyproject.toml
 setup.py
 snp.sh
 snips/__init__.py
@@ -29,6 +30,7 @@ snips/entrypoints/cli/utils.py
 snips/infrastructure/__init__.py
 snips/infrastructure/console_logger/__init__.py
 snips/infrastructure/console_logger/console_logger.py
+snips/infrastructure/console_logger/themes.py
 snips/infrastructure/repository/__init__.py
 snips/infrastructure/repository/tinydb_repository.py
 snips/ioc/__init__.py
@@ -39,11 +41,13 @@ tests/../.env
 tests/../snp.sh
 tests/domain/__init__.py
 tests/domain/test_snippet.py
-tests/domain/entrypoints/__init__.py
-tests/domain/entrypoints/cli/__init__.py
-tests/domain/entrypoints/cli/test_cli.py
-tests/domain/entrypoints/cli/test_config.py
-tests/domain/entrypoints/cli/test_utils.py
+tests/entrypoints/__init__.py
+tests/entrypoints/cli/__init__.py
+tests/entrypoints/cli/test_cli.py
+tests/entrypoints/cli/test_config.py
+tests/entrypoints/cli/test_utils.py
 tests/infrastructure/__init__.py
+tests/infrastructure/console_logger/__init__.py
+tests/infrastructure/console_logger/test_themes.py
 tests/infrastructure/repository/__init__.py
 tests/infrastructure/repository/test_tinydb_repository.py

@@ -43,6 +43,7 @@ class TestCli:
     @pytest.fixture(autouse=True)
     def _setup(self):
         # set eniron
+        settings.CONFIG.DB_URI = '/home/cezaryl/test-db.json'
         result = runner.invoke(app, ['config', 'set', 'format', 'json'])
         assert result.exit_code == 0
 
