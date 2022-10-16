@@ -9,3 +9,4 @@ trash.py
 app.build
 snips.egg-info
 coverage
+snp.sh
