@@ -22,6 +22,25 @@ This will install snips into your global python interpreter libs.
 
 `pip install snips`
 
+## Configuration
+
+You can customize snips by changing it's configuration. 
+
+To view possible configuration commands:
+
+`snp config --help`
+
+Configuration contains following attributes:
+
+`CONSOLE_OUTPUT`: manages output display
+
+`DB_PROVIDER`: sets your persistence layer provider.
+For now, only file-based document oriented database (provided by TinyDB) is supported, which maps to: `json` value.
+
+`DB_URI`: uri for your database. With `DB_PROVIDER=json` this must be path to .json file.
+
+
+
 ## Usage
 
 Whole interface is terminal based. You don't have to open anything with external programs.
@@ -64,8 +83,6 @@ Or providing arguments upfront:
 
 
 
-
-
 ### run
 
 
@@ -93,23 +110,6 @@ Deletes snippet from repository
 
 `snp rm `
 
-
-## Configuration
-
-You can customize snips by changing it's configuration. 
-
-To view possible configuration commands:
-
-`snp config --help`
-
-Configuration contains following attributes:
-
-`CONSOLE_OUTPUT`: manages output display
-
-`DB_PROVIDER`: sets your persistence layer provider.
-For now, only file-based document oriented database (provided by TinyDB) is supported, which maps to: `json` value.
-
-`DB_URI`: uri for your database. With `DB_PROVIDER=json` this must be path to .json file.
 
 
 
