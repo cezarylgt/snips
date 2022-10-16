@@ -1,11 +1,6 @@
 import abc
 from dataclasses import dataclass, asdict
 
-from tinydb import TinyDB, Query
-
-from snips.settings import CONFIG
-import snips.settings as settings
-
 
 @dataclass
 class Theme:
@@ -42,10 +37,6 @@ class Theme:
         return asdict(self)
 
 
-class ThemeNotFound(Exception):
-    pass
-
-
 DEFAULT_THEME = Theme(
     name='default',
     header='blue',
@@ -62,21 +53,4 @@ class IThemeRepository:
     @abc.abstractmethod
     def get_by_id(self, id: str): ...
 
-
-class TinyDbThemeRepository(IThemeRepository):
-
-    def __init__(self, path: str = settings.THEMES_URI):
-        self.db = TinyDB(path)
-        self.table = self.db.table('themes')
-
-        self._query = Query()
-
-    def get_by_id(self, id: str):
-        if id == 'default':
-            return DEFAULT_THEME
-
-        result = self.table.get(self._query.name == id)
-        if result:
-            return Theme(**result)
-        raise ThemeNotFound
 

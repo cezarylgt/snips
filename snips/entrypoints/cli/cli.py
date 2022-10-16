@@ -1,14 +1,18 @@
 import os
-from typing import List, Optional
+# import readline
+from typing import List
 
 import pyperclip
 import typer
 from rich import print as rich_print
 
 import snips.domain as dm
+from .config import app as config_app
 from .utils import bootstrap, dto_from_prompt, prepare_command, read_file, parse_dict, prepare_command_with_args, \
     parse_tags
-from .config import app as config_app
+
+# readline
+
 
 app = bootstrap()
 tags_app = typer.Typer()
@@ -41,9 +45,12 @@ def show(alias: str):
 
 
 @app.command()
-def ls():
+def ls(tags: List[str] = typer.Option(None, '--tags', '-t', help="List snippet by tags")):
     """List all available snippets"""
-    result = app.repository.get_all()
+    if tags:
+        result = app.repository.get_by_tags(tags)
+    else:
+        result = app.repository.get_all()
     app.console_logger.log_snippets(*result)
 
 

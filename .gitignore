@@ -6,3 +6,6 @@ pytest-cahe/
 **/.idea/**
 trash.py
 .coverage
+app.build
+snips.egg-info
+coverage

@@ -1,8 +1,12 @@
 from typing import List
 
-from snips.domain import ISnippetRepository, Snippet, TagMatchingMode
+from snips import settings as settings
+from snips.domain import ISnippetRepository, Snippet, TagMatchingMode, IThemeRepository, Theme
 import snips.domain.exceptions as ex
 from tinydb import TinyDB, Query
+
+from snips.domain.exceptions import ThemeNotFound
+from snips.domain.themes.themes import DEFAULT_THEME
 from snips.settings import CONFIG
 
 
@@ -52,3 +56,21 @@ class TinyDbSnipperRepository(ISnippetRepository):
 
     def remove_all(self) -> None:
         self.db.drop_table('Snippets')
+
+
+class TinyDbThemeRepository(IThemeRepository):
+
+    def __init__(self, path: str = settings.THEMES_URI):
+        self.db = TinyDB(path)
+        self.table = self.db.table('themes')
+
+        self._query = Query()
+
+    def get_by_id(self, id: str):
+        if id == 'default':
+            return DEFAULT_THEME
+
+        result = self.table.get(self._query.name == id)
+        if result:
+            return Theme(**result)
+        raise ThemeNotFound

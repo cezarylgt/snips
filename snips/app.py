@@ -1,6 +1,8 @@
-import snips.settings
+import readline
+
 from snips.entrypoints.cli import app
-# import readline
+
+readline # to stop sending not char keysrtokes as text to terminal
 
 
 

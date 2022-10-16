@@ -5,6 +5,17 @@ A command-line snippet manager, written in Python.
 Execute, store, modify or copy to clipboard code snippets without leaving your favourite terminal.
 
 # Install
+
+## github
+
+Clone this repository then install all dependencies.
+
+Deactivate virtual environment and from root project path run:
+
+`pip install .`
+
+This will install snips into your global python interpreter libs.
+
 ## Requirements
 
 `Python` >= 3.8
@@ -30,7 +41,7 @@ To call snips:
 
 
 
-### Add
+### add
 
 To add new snippet simply:
 
@@ -40,47 +51,47 @@ Then prompt will ask you for all required data.
 
 You can declare snippet with arguments that will be interpolated from  `snippet.defaults` attribute or asked by prompt during execution or copying to clipboard. 
 
-To do this you have to write `snippet.snippet` attribute as
+To do this you have to write `snippet` attribute as
 
 `ls <@arg>directory</@arg>`
 
 Then run it with:
-`snp run :snippet.alias` (prompt will ask for directory argument)
+`snp run <alias>` (prompt will ask for directory argument)
 
 Or providing arguments upfront:
 
-`snp run :snippet.alias --args directory=/home/guest`
+`snp run <alias> --args directory=/home/guest`
 
 
 
 
 
-### Execute
+### run
 
 
-`snp run :snippet-alias:`
+`snp run <alias>`
 
 
 ### get
 
 Default behaviour copies snippet command to clipboard
 
-`snp get <path>`
+`snp get <alias>`
 
 
-`snp run <path>`
+`snp run <alias>`
 
 ### show
 
-shows details about given snippet
+Shows details about given snippet
 
 `snp show <alias>`
 
-### delete
+### remove
 
 Deletes snippet from repository
 
-`snp delete `
+`snp rm `
 
 
 ## Configuration

@@ -7,7 +7,7 @@ from snips import domain as dm
 from snips.domain.service import SnippetService
 from snips.infrastructure import IConsoleLogger
 from snips.ioc import get_ioc
-
+# import readline
 _EMOJI = ":question:"
 _TAG_SEPARATOR = ' '
 
@@ -40,6 +40,7 @@ def dto_from_prompt(df: dm.Snippet = None, snippet: str = None) -> dm.SnippetDto
 
     if not snippet:
         snippet = Prompt.ask(f"{_EMOJI} Snippet", default=df.snippet if df else None)
+        # snippet = input("Snippet")
         dm.Validators.snippet_cannot_be_empty(snippet)
 
     desc = Prompt.ask(f"{_EMOJI} Description", default=df.desc if df else None)

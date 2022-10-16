@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from snips.domain import IThemeRepository
-from snips.domain.themes.themes import TinyDbThemeRepository
+from snips.infrastructure.repository.tinydb_repository import TinyDbThemeRepository
 import snips.settings as settings
 import snips.infrastructure as infra
 
