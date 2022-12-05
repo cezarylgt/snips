@@ -5,7 +5,7 @@ from typing import List
 class Validators:
 
     @staticmethod
-    def alias_cannot_have_white_chars(alias):
+    def alias_cannot_have_white_chars(alias: str):
         if re.search('\s+', alias):
             raise ValueError("Aliases cannot have white chars!")
         return alias

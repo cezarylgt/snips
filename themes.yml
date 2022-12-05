@@ -1,0 +1,8 @@
+- name: 'default'
+  header: 'yellow'
+  text: 'green'
+  _snippet: 'dark_orange'
+  _alias: 'magenta'
+  _desc: 'yellow'
+
+

@@ -5,17 +5,24 @@ import snips.domain as dm
 import snips.domain.snippet as sn
 
 
+@pytest.mark.unit
 class TestArgumentTagProcessor:
+
+    @pytest.fixture(autouse=True)
+    def _setup(self):
+        self.sut = sn.ArgumentTagProcessor
 
     def test_remove_arg_tag(self):
         string = f'{sn.ArgumentTagProcessor.OPENING_TAG} argument {sn.ArgumentTagProcessor.CLOSING_TAG} -f {sn.ArgumentTagProcessor.OPENING_TAG} second {sn.ArgumentTagProcessor.CLOSING_TAG}'
-        result = sn.ArgumentTagProcessor.clean_string(string)
+        result = self.sut.clean_string(string)
         assert result == 'argument -f second'
 
     def test_remove_arg_tags_with_nested_qoutes(self):
         # string = f'find {sn.ArgumentTagProcessor.OPENING_TAG}dir{sn.ArgumentTagProcessor.CLOSING_TAG} -f {sn.ArgumentTagProcessor.OPENING_TAG} second {sn.ArgumentTagProcessor.CLOSING_TAG}'
         string = "find <@arg>dir</@arg> -name '*.<@arg>ext</@arg>'"
-        result = sn.ArgumentTagProcessor.clean_string(string, interpolation=True)
+        result = self.sut.clean_string(string, interpolation=True)
+        print(result)
+        assert result == "find {dir} -name '*.{ext}'"
 
 
 @pytest.mark.unit

@@ -2,11 +2,16 @@ from dataclasses import dataclass, asdict
 from datetime import datetime
 from typing import List, Collection, Set, Optional
 import re
+from collections import OrderedDict
 import snips.domain.exceptions as ex
 
 from pydantic import BaseModel, validator
 
 from snips.domain.validators import Validators
+
+def _ordered_set(values: Collection) -> set:
+    a =  OrderedDict({v: None for v in values}).keys()
+    return a
 
 
 class ISnippetVarsProcessor:
@@ -42,7 +47,7 @@ class ISnippetVarsProcessor:
     @classmethod
     def find_and_clean(cls, string: str) -> set:
         dirty_arguments = re.findall(cls.TAG_PATTERN, string)
-        return {cls._clean(s) for s in dirty_arguments}
+        return  {cls._clean(s) for s in dirty_arguments}
 
 
 class ArgumentTagProcessor(ISnippetVarsProcessor):

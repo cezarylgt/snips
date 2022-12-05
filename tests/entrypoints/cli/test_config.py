@@ -12,19 +12,20 @@ import ast
 runner = CliRunner()
 
 
+# todo: assert results
 @pytest.mark.e2e
 class TestConfigCli:
-    def test_show_prints_configuration(self):
+    def test_cli_config_show_should_print_configuration(self):
         result = runner.invoke(app, ['config', 'show'])
         print(result.stdout)
         assert result.exit_code == 0
         print(result)
 
-    def test_set_format(self):
+    def test_cli_config_set_should_set_format(self):
         result = runner.invoke(app, ['config', 'set', 'format', 'table'])
         assert result.exit_code == 0
 
-    def test_get_path_returns_path_to_config(self):
+    def test_cli_config_get_path_should_print_path_of_config_file(self):
         result = runner.invoke(app, ['config', 'path'])
         assert result.exit_code == 0
 
@@ -53,7 +54,8 @@ class TestCli:
                 alias='test1',
                 snippet='ls <@arg>directory</@arg>',
                 desc='description',
-                tags=['bash']
+                tags=['bash'],
+                defaults={'directory': 'YOUR HOME DIRECTORY'}
             )
         )
         app.service.create(
@@ -61,7 +63,7 @@ class TestCli:
                 alias='test2',
                 snippet='ls <@arg>directory</@arg>',
                 desc='description',
-                tags=['bash']
+                tags=['bash', 'sql']
             )
         )
 
@@ -71,25 +73,37 @@ class TestCli:
         yield
         app.repository.remove_all()
 
-    def test_show_by_alias(self):
+    def test_cli_show_by_alias(self):
         result = runner.invoke(app, ['show', 'test1'])
         assert result.exit_code == 0
         assert dsr(result.stdout) == self.snippet1.dict()
 
-    def test_ls_should_print_all_snippets(self):
+    def test_cli_ls_should_print_all_snippets(self):
         result = runner.invoke(app, ['ls'])
         assert result.exit_code == 0
         objects = dsr(rpl(result.stdout))
-        assert len(objects) == 2
         assert objects == [self.snippet1.dict(), self.snippet2.dict()]
 
-    def test_get_with_raw_option_should_copy_to_clipboard_without_arg_interpolation(self):
+    def test_cli_ls_with_tags_should_print_snippets_only_containing_given_tags(self):
+        result = runner.invoke(app, ['ls', '--tags', 'sql', '--tags-mode', 'any'])
+        assert result.exit_code == 0
+        objects = dsr(rpl(result.stdout))
+        assert objects == [self.snippet2.dict()]
+
+    def test_cli_get_should_copy_snippet_to_clipboard_with_defaults_and(self):
+        result = runner.invoke(app, ['get', 'test1'])
+        print(result.stdout)
+        assert result.exit_code == 0
+        assert self.snippet1.parse_command() in result.stdout
+        assert pyperclip.paste() == self.snippet1.parse_command()
+
+    def test_cli_get_with_raw_option_should_copy_to_clipboard_without_arg_interpolation(self):
         result = runner.invoke(app, ['get', 'test1', '--raw'])
         print(result.stdout)
         assert result.exit_code == 0
         assert pyperclip.paste() == self.snippet1.snippet
 
-    def test_delete_removes_permanently(self):
+    def test_cli_rm_removes_permanently(self):
         result = runner.invoke(app, ['rm', 'test1'])
         assert result.exit_code == 0
         assert not app.repository.exists('test1')
@@ -97,7 +111,7 @@ class TestCli:
     @pytest.mark.parametrize(
         'arg_names', [LongArgs, ShortArgs]
     )
-    def test_add(self, arg_names):
+    def test_cli_add_should_add_new_snippet(self, arg_names):
         result = runner.invoke(app, ['add',
                                      arg_names.alias, 'test3',
                                      arg_names.snippet, 'some-command',
@@ -107,18 +121,46 @@ class TestCli:
                                      ]
                                )
         assert result.exit_code == 0
-        modified = app.repository.get_by_id('test3')
-        assert modified.alias == 'test3'
-        assert modified.snippet == 'some-command'
-        assert modified.desc == '3rd snippet'
-        assert modified.tags == ['python', 'bash']
+        created = app.repository.get_by_id('test3')
+        assert created.alias == 'test3'
+        assert created.snippet == 'some-command'
+        assert created.desc == '3rd snippet'
+        assert created.tags == ['python', 'bash']
 
         print(result)
 
     @pytest.mark.parametrize(
         'arg_names', [LongArgs, ShortArgs]
     )
-    def test_edit(self, arg_names):
+    def test_cli_add_with_file_should_read_file_content_and_assing_to_snippet(self, arg_names):
+        test_path = 'test-file.txt'
+        with open(test_path, 'w') as f:
+            f.write('snippet read from file')
+
+        try:
+            result = runner.invoke(app, ['add',
+                                         arg_names.file, test_path,
+                                         arg_names.alias, 'test3',
+                                         arg_names.desc, '3rd snippet',
+                                         arg_names.tags, 'python',
+                                         arg_names.tags, 'bash'
+                                         ]
+                                   )
+            assert result.exit_code == 0
+            created = app.repository.get_by_id('test3')
+            assert created.alias == 'test3'
+            assert created.snippet == 'snippet read from file'
+            assert created.desc == '3rd snippet'
+            assert created.tags == ['python', 'bash']
+        except Exception as e:
+            raise e
+        finally:
+            os.remove(test_path)
+
+    @pytest.mark.parametrize(
+        'arg_names', [LongArgs, ShortArgs]
+    )
+    def test_cli_edit_should_edit(self, arg_names):
         result = runner.invoke(app, ['edit',
                                      'test1',
                                      arg_names.alias, 'test1',
@@ -133,6 +175,6 @@ class TestCli:
         assert modified.desc == 'edited description'
         assert modified.tags == ['sql']
 
-    def test_run_with_rpovided_arg(self):
+    def test_run_with_provided_arg(self):
         result = runner.invoke(app, ['run', 'test1', '--args', 'directory=.'])
         assert result.exit_code == 0

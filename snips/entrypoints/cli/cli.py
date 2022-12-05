@@ -26,6 +26,7 @@ class LongArgs:
     desc = '--desc'
     tags = '--tags'
     defaults = '--defaults'
+    file = '--file'
 
 
 class ShortArgs:
@@ -34,6 +35,7 @@ class ShortArgs:
     desc = '-d'
     tags = '-t'
     defaults = '-df'
+    file = '-f'
 
 
 # QUERIES
@@ -45,19 +47,15 @@ def show(alias: str):
 
 
 @app.command()
-def ls(tags: List[str] = typer.Option(None, '--tags', '-t', help="List snippet by tags")):
+def ls(tags: List[str] = typer.Option(None, '--tags', '-t', help="List snippet by tags"),
+       tags_mode: dm.TagMatchingMode = typer.Option(dm.TagMatchingMode.any, '--tags-mode', '-tm',
+                                                    help="Tags matching mode")
+       ):
     """List all available snippets"""
     if tags:
-        result = app.repository.get_by_tags(tags)
+        result = app.repository.get_by_tags(tags, tags_mode)
     else:
         result = app.repository.get_all()
-    app.console_logger.log_snippets(*result)
-
-
-@tags_app.command('get')
-def tags_get(tags: List[str], mode: dm.TagMatchingMode = dm.TagMatchingMode.any):
-    """Search snippets by tags"""
-    result = app.repository.get_by_tags(tags, mode)
     app.console_logger.log_snippets(*result)
 
 

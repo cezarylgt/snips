@@ -44,7 +44,6 @@ DEFAULT_THEME = Theme(
     _snippet='dark_orange',
     _alias='magenta',
     _desc='yellow'
-
 )
 
 
