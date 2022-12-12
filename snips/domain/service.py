@@ -4,7 +4,7 @@ from snips.domain import ISnippetRepository, SnippetDto, Snippet
 import snips.domain.exceptions as ex
 
 
-class SnippetService(abc.ABC):
+class SnippetService:
 
     def __init__(self, repository: ISnippetRepository):
         self.repository = repository

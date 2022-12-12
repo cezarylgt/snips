@@ -61,13 +61,3 @@ class ISnippetRepository:
 
     @abc.abstractmethod
     def remove_all(self) -> None: ...
-
-
-class IConfigurationRepository:
-
-    @abc.abstractmethod
-    def get_all(self): ...
-
-    def get_by_id(self, id: str): ...
-
-    def save(self): ...

@@ -20,9 +20,3 @@ setup(
         snp=snips.app:app
     '''
 )
-
-# todo:
-#   console logger - loging info (messages to user)
-#   themes:
-#       theme as domain object
-#       theme cli

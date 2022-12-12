@@ -156,6 +156,18 @@ class TestCli:
             raise e
         finally:
             os.remove(test_path)
+    def test_cli_add_should_raise_exception_if_alias_already_exists(self):
+        result = runner.invoke(app, ['add',
+                                     LongArgs.alias, 'test2',
+                                     LongArgs.snippet, 'some-command',
+                                     LongArgs.desc, '3rd snippet',
+                                     LongArgs.tags, 'python',
+                                     LongArgs.tags, 'bash'
+                                     ]
+                               )
+        assert result.exit_code == 1
+        print(result)
+        print(result.stdout)
 
     @pytest.mark.parametrize(
         'arg_names', [LongArgs, ShortArgs]

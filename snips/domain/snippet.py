@@ -9,10 +9,7 @@ from pydantic import BaseModel, validator
 
 from snips.domain.validators import Validators
 
-def _ordered_set(values: Collection) -> set:
-    a =  OrderedDict({v: None for v in values}).keys()
-    return a
-
+#todo: fix arguments sort order when parsing
 
 class ISnippetVarsProcessor:
     OPENING_TAG: str
@@ -75,18 +72,12 @@ class Snippet:
     def get_arguments(self) -> set[str]:
         return ArgumentTagProcessor.find_and_clean(self.snippet)
 
-    def all_arguments_have_defaults(self):
-        if not self.defaults:
-            return False
-
-        self.get_arguments()
-
     def get_missing_default_arguments(self, external_arguments: Collection[str] = None) -> Set[str]:
         if external_arguments is None:
             external_arguments = set()
         arguments = self.get_arguments()
-        df = self.defaults or dict()
-        return arguments.difference(set(df.keys()).union(set(external_arguments)))
+        defaults = self.defaults or dict()
+        return arguments.difference(set(defaults.keys()).union(set(external_arguments)))
 
     def parse_command(self, external_args: dict = None):
         if not external_args:

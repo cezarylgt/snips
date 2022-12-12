@@ -87,7 +87,8 @@ class TestSnippet:
         snippet.defaults = None
         with pytest.raises(KeyError):
             snippet.parse_command(dict(filename='external-value'))
-
+    def test_all_argumenents_have_defaults(self):
+        snippet = self._example()
 
 @pytest.mark.unit
 class TestCreateSnippetDto:

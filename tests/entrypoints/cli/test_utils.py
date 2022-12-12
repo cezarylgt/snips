@@ -15,6 +15,10 @@ def test_parse_tags_returns_tags_as_is_if_tags_are_collection():
     result = utils.parse_tags(['1', '2', '3'])
     assert result == ['1', '2', '3']
 
+@pytest.mark.unit
+def test_parse_tags_raises_exception_if_invalid_type():
+    with pytest.raises(TypeError):
+        utils.parse_tags(list)
 
 @pytest.mark.unit
 @pytest.mark.parametrize('string', [
@@ -44,6 +48,7 @@ def test_dto_from_prompt_builds_snippet_if_snippet_is_none():
         assert result.defaults == {'key1': 'value1', 'key2': 'value2'}
 
 
+
 #todo: resolve set random order problem
 @pytest.mark.unit
 def test_prepare_command():
@@ -57,4 +62,16 @@ def test_prepare_command():
         mocked_ask.side_effect = ['directory', 'extension']
         result = utils.prepare_command(snp)
     print(result)
+    assert result == "find directory -name '*.extension'"
+
+def test_prepare_command_with_args():
+    snp = Snippet(
+        alias='find',
+        snippet="find <@arg>dir</@arg> -name '*.<@arg>ext</@arg>'",
+        desc='find files by extension',
+        tags=['bash']
+    )
+    with patch('rich.prompt.Prompt.ask') as mocked_ask:
+        mocked_ask.side_effect = ['directory', 'extension']
+        result  = utils.prepare_command_with_args(snp)
     assert result == "find directory -name '*.extension'"
