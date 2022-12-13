@@ -1,15 +1,12 @@
+import re
 from dataclasses import dataclass, asdict
 from datetime import datetime
 from typing import List, Collection, Set, Optional
-import re
-from collections import OrderedDict
-import snips.domain.exceptions as ex
 
 from pydantic import BaseModel, validator
 
 from snips.domain.validators import Validators
 
-#todo: fix arguments sort order when parsing
 
 class ISnippetVarsProcessor:
     OPENING_TAG: str

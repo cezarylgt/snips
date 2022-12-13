@@ -23,17 +23,17 @@ Snips is invoked by following command:
 `snp --help`
 
 ```commandline
-╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ add                                                   Create new snippet                                                                                                                                                                                                                                             │
-│ config                                                Manage configuration                                                                                                                                                                                                                                           │
-│ edit                                                  Update existing snippet                                                                                                                                                                                                                                        │
-│ get                                                   Copy snippet value into clipboard                                                                                                                                                                                                                              │
-│ ls                                                    List all available snippets                                                                                                                                                                                                                                    │
-│ rm                                                    Remove snippet                                                                                                                                                                                                                                                 │
-│ run                                                   Execute snippet in your OS                                                                                                                                                                                                                                     │
-│ show                                                  Show snippet data                                                                                                                                                                                                                                              │
-│ tags                                                  Manage tags                                                                                                                                                                                                                                                    │
-╰─────────────────────────────────────────────────────────────────────────────────
+╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+│ add                                                   Create new snippet                                       
+│ config                                                Manage configuration                                     
+│ edit                                                  Update existing snippet                                  
+│ get                                                   Copy snippet value into clipboard                        
+│ ls                                                    List all available snippets                              
+│ rm                                                    Remove snippet                                           
+│ run                                                   Execute snippet in your OS                               
+│ show                                                  Show snippet data                                        
+│ tags                                                  Manage tags                                              
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 
 ```
 You can declare snippet with arguments that will be interpolated from  `defaults` attribute or asked by prompt during execution or copying to clipboard. 

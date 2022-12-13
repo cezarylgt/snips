@@ -9,6 +9,15 @@ import snips.settings as settings
 import pyperclip
 import ast
 
+
+def dsr(s: str) -> Any:
+    return ast.literal_eval(s)
+
+
+def rpl(s: str):
+    return '[{}]'.format(s.replace("}\n{", "},{"))
+
+
 runner = CliRunner()
 
 
@@ -17,25 +26,22 @@ runner = CliRunner()
 class TestConfigCli:
     def test_cli_config_show_should_print_configuration(self):
         result = runner.invoke(app, ['config', 'show'])
-        print(result.stdout)
         assert result.exit_code == 0
-        print(result)
+        config = dsr(result.stdout)
+        assert all(x in config for x in ['FORMAT', 'DB_URI', 'DB_PROVIDER'])
+        print(result.stdout)
 
     def test_cli_config_set_should_set_format(self):
         result = runner.invoke(app, ['config', 'set', 'format', 'table'])
         assert result.exit_code == 0
+        result = runner.invoke(app, ['config', 'show'])
+        config = dsr(result.stdout)
+        print(result.stdout)
+        assert config['FORMAT'] == 'table'
 
     def test_cli_config_get_path_should_print_path_of_config_file(self):
         result = runner.invoke(app, ['config', 'path'])
         assert result.exit_code == 0
-
-
-def dsr(s: str) -> Any:
-    return ast.literal_eval(s)
-
-
-def rpl(s: str):
-    return '[{}]'.format(s.replace("}\n{", "},{"))
 
 
 @pytest.mark.e2e
@@ -156,6 +162,7 @@ class TestCli:
             raise e
         finally:
             os.remove(test_path)
+
     def test_cli_add_should_raise_exception_if_alias_already_exists(self):
         result = runner.invoke(app, ['add',
                                      LongArgs.alias, 'test2',
