@@ -1,8 +1,10 @@
 import abc
+import json
 from enum import Enum
 from typing import List, Optional, Any
+import yaml
 
-from rich import print as rich_print
+from rich import print as rich_print, print_json
 from rich.console import Console
 from rich.table import Table
 
@@ -43,7 +45,15 @@ class JsonConsoleLogger(IConsoleLogger):
         rich_print(o)
 
     def _log_snippet(self, snp: dm.Snippet) -> None:
-        rich_print(snp.dict())
+        print_json(json.dumps(snp.dict(), default=str))
+
+
+class YamlConsoleLogger(IConsoleLogger):
+    def print(self, o: Any):
+        rich_print(o)
+
+    def _log_snippet(self, snp: dm.Snippet) -> None:
+        rich_print('\n' + yaml.dump(snp.dict(), allow_unicode=True, sort_keys=False))
 
 
 class PrettyConsoleLogger(IConsoleLogger):
@@ -55,7 +65,7 @@ class PrettyConsoleLogger(IConsoleLogger):
         rich_print(f'[{self._theme.text}]{o}[/{self._theme.text}]')
 
     def _convert(self, snp: dm.Snippet) -> str:
-        return rf"""\
+        return rf"""
     [{self._theme.header}]Alias:[/{self._theme.header}] [{self._theme.alias}]{snp.alias}[/{self._theme.alias}]
     [{self._theme.header}]Snippet:[/{self._theme.header}] [{self._theme.snippet}]{snp.snippet}[/{self._theme.snippet}]
     [{self._theme.header}]Defaults:[/{self._theme.header}] [{self._theme.defaults}]{snp.defaults or ''}[/{self._theme.defaults}]
@@ -95,14 +105,16 @@ class ConsoleLoggerProviderEnum(str, Enum):
     JSON = 'json'
     PRETTY = 'pretty'
     TABLE = 'table'
+    YAML = 'yaml'
 
 
 class ConsoleLoggerFactory:
     _mapping = {
-        ConsoleLoggerProviderEnum.POOR: PrettyConsoleLogger,
+        ConsoleLoggerProviderEnum.POOR: PoorConsoleLoger,
         ConsoleLoggerProviderEnum.JSON: JsonConsoleLogger,
         ConsoleLoggerProviderEnum.PRETTY: PrettyConsoleLogger,
-        ConsoleLoggerProviderEnum.TABLE: TableConsoleLogger
+        ConsoleLoggerProviderEnum.TABLE: TableConsoleLogger,
+        ConsoleLoggerProviderEnum.YAML: YamlConsoleLogger
     }
 
     @staticmethod

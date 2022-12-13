@@ -14,7 +14,7 @@ class TestTinyDbRepository:
 
     @pytest.fixture(autouse=True)
     def _setup(self):
-        self.sut = tdb.TinyDbSnipperRepository(self._TEST_DB_URI)
+        self.sut = tdb.TinyDbSnippetRepository(self._TEST_DB_URI)
 
         print('INIT STATE IS', self.sut.get_all())
         yield

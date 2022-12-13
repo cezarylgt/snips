@@ -29,6 +29,8 @@ def bootstrap() -> Snips:
 
 
 def parse_tags(tags: str | Collection) -> List[str]:
+    if not tags:
+        return []
     print('tags type', type(tags))
     if isinstance(tags, str):
         return [t.strip() for t in tags.split(_TAG_SEPARATOR)]
@@ -66,16 +68,19 @@ def dto_from_prompt(df: dm.Snippet = None, snippet: str = None) -> dm.SnippetDto
     """
     alias = Prompt.ask(f"{_EMOJI} Alias", default=df.alias if df else None)
     dm.Validators.alias_cannot_have_white_chars(alias)
+    print()
 
     if not snippet:
         snippet = Prompt.ask(f"{_EMOJI} Snippet", default=df.snippet if df else None)
-        # snippet = input("Snippet")
         dm.Validators.snippet_cannot_be_empty(snippet)
+        print()
 
     description = Prompt.ask(f"{_EMOJI} Description", default=df.desc if df else None)
+    print()
     input_tags = Prompt.ask(f"{_EMOJI} Tags (space separated) ",
                             default=_TAG_SEPARATOR.join(df.tags) if df else None
                             )
+    print()
     defaults = Prompt.ask(f"{_EMOJI} Default values for provided arguments", default=df.defaults if df else None)
 
     return dm.SnippetDto(

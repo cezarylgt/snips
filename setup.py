@@ -20,3 +20,5 @@ setup(
         snp=snips.app:app
     '''
 )
+
+# zapewnij inna konfiguracje dla testow

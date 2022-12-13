@@ -3,11 +3,7 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 
 from dotenv import load_dotenv, set_key, dotenv_values
-from snips.config.config import load_prompt_questions
-
-CONFIG_HOME = os.path.join(os.environ['HOME'], '.snips')
-CONFIG_PATH = os.path.join(CONFIG_HOME, 'config.env')
-THEMES_URI = os.path.join(CONFIG_HOME, 'themes.json')
+from snips.config import load_prompt_questions
 
 
 class ConfigEnum(str, Enum):
@@ -24,10 +20,16 @@ class ConfigEnum(str, Enum):
         return list(map(lambda c: c.value, cls))
 
 
+load_dotenv()
+CONFIG_HOME =  os.path.join(os.path.dirname(__file__), os.environ['CONFIG_HOME']) if os.environ.get('CONFIG_HOME') else os.path.join(os.environ['HOME'], '.snips')
+CONFIG_PATH = os.path.join(CONFIG_HOME, 'config.env')
+THEMES_URI = os.path.join(CONFIG_HOME, 'themes.json')
+
+
 @dataclass
 class Configuration:
     DB_PROVIDER: str = 'json'
-    DB_URI: str = os.path.join(CONFIG_HOME, 'snips-db.json')
+    DB_URI: str = 'snips-db.json'
     FORMAT: str = 'table'
     HEADER_STYLE: str = 'yellow'
     SNIPPET_STYLE: str = 'green'
@@ -37,6 +39,7 @@ class Configuration:
     @classmethod
     def from_environ(cls):
         init_di = {key: os.environ.get(key) for key in ConfigEnum.list()}
+        init_di['DB_URI'] = os.path.join(CONFIG_HOME, 'snips-db.json')
         return cls(**init_di)
 
     def __post_init__(self):

@@ -2,7 +2,7 @@ import pytest
 import snips.domain.exceptions as ex
 from snips.domain import SnippetDto
 from snips.domain.service import SnippetService
-from snips.infrastructure.repository.tinydb_repository import TinyDbSnipperRepository
+from snips.infrastructure.repository.tinydb_repository import TinyDbSnippetRepository
 from unittest.mock import patch, MagicMock
 
 @pytest.mark.unit
@@ -20,9 +20,9 @@ class TestSnippetService:
             tags=['bash']
         )
         with pytest.raises(ex.AliasAlreadyExists) as e:
-            with patch.object(TinyDbSnipperRepository, 'exists') as mocked_method:
+            with patch.object(TinyDbSnippetRepository, 'exists') as mocked_method:
                 mocked_method.return_value = True
-                service = SnippetService(TinyDbSnipperRepository())
+                service = SnippetService(TinyDbSnippetRepository())
                 service.create(request)
 
     def test_create(self):
@@ -32,9 +32,9 @@ class TestSnippetService:
             desc='description',
             tags=['bash']
         )
-        with patch.object(TinyDbSnipperRepository, 'exists') as mocked_method:
+        with patch.object(TinyDbSnippetRepository, 'exists') as mocked_method:
             mocked_method.return_value = True
-            service = SnippetService(TinyDbSnipperRepository())
+            service = SnippetService(TinyDbSnippetRepository())
             service.create(request, True)
 
 

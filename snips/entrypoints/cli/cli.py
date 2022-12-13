@@ -1,13 +1,14 @@
 import os
 # import readline
 from typing import List
-
+from dotenv import dotenv_values, set_key
+from rich import print
+from snips.infrastructure.console_logger import ConsoleLoggerProviderEnum
 import pyperclip
 import typer
 from rich import print as rich_print
-
+import snips.settings as settings
 import snips.domain as dm
-from .config import app as config_app
 from .utils import bootstrap, dto_from_prompt, prepare_command, read_file, parse_dict, prepare_command_with_args, \
     parse_tags
 
@@ -17,7 +18,6 @@ from .utils import bootstrap, dto_from_prompt, prepare_command, read_file, parse
 app = bootstrap()
 tags_app = typer.Typer()
 app.add_typer(tags_app, name='tags', help="Manage tags")
-app.add_typer(config_app, name='config', help="Manage configuration")
 
 
 class LongArgs:
@@ -117,7 +117,6 @@ def add(
         )
     else:
         dto = dto_from_prompt(snippet_content)
-    print('created dto', dto)
     e = app.service.create(dto)
     app.console_logger.log_snippets(e)
 
@@ -158,3 +157,47 @@ def run(alias: str,
     snippet = app.repository.get_by_id(alias)
     cmd = prepare_command(snippet, parse_dict(args))
     os.system(cmd + " " + pa)
+
+
+# CONFIGURATION MANAGEMENT
+
+
+config_app = typer.Typer()
+set_app = typer.Typer(name='set', help="Manage configuration variables")
+config_app.add_typer(set_app)
+app.add_typer(config_app, name='config', help="Manage configuration")
+
+
+@config_app.command()
+def show():
+    """returns current configuration"""
+    cfg = dotenv_values(settings.CONFIG_PATH)
+    print(dict(cfg))
+
+
+@set_app.command("env")
+def set_variable(var: settings.ConfigEnum, value: str):
+    """Set configuration variable py providing name and value"""
+    set_key(settings.CONFIG_PATH, var, value)
+
+
+@set_app.command()
+def db_uri(uri: str):
+    """Change your db uri.
+    If DB_PROVIDER is set to 'json', this must be path to .json file
+    """
+    set_key(settings.CONFIG_PATH, settings.ConfigEnum.DB_URI, uri)
+
+
+@set_app.command()
+def format(format: ConsoleLoggerProviderEnum):
+    """
+    Change your display format
+    """
+    set_key(settings.CONFIG_PATH, settings.ConfigEnum.FORMAT, format)
+
+
+@config_app.command()
+def path():
+    """returns path to your configuration"""
+    print(settings.CONFIG_PATH)

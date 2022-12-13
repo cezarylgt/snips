@@ -1,13 +1,15 @@
-from typing import List
-
+from typing import List, Any
+from datetime import datetime
 from snips import settings as settings
 from snips.domain import ISnippetRepository, Snippet, TagMatchingMode, IThemeRepository, Theme
 import snips.domain.exceptions as ex
-from tinydb import TinyDB, Query
-
+from tinydb import TinyDB, Query, JSONStorage
+import json
 from snips.domain.exceptions import ThemeNotFound
 from snips.domain.themes.themes import DEFAULT_THEME
 from snips.settings import CONFIG
+from tinydb_serialization import SerializationMiddleware
+from tinydb_serialization.serializers import DateTimeSerializer
 
 
 def deserialize(di: dict) -> Snippet:
@@ -20,11 +22,15 @@ def deserialize_many(dis: List[dict]) -> List[Snippet]:
     return [deserialize(di) for di in dis if di is not None]
 
 
-class TinyDbSnipperRepository(ISnippetRepository):
+serialization = SerializationMiddleware(JSONStorage)
+serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
+
+
+class TinyDbSnippetRepository(ISnippetRepository):
     """Implementation of ISnippetRepository for TinyDB lib"""
 
-    def __init__(self, path: str = CONFIG.DB_URI):
-        self.db = TinyDB(path)
+    def __init__(self, path: str  = CONFIG.DB_URI):
+        self.db = TinyDB(path, storage=serialization)
         self.table = self.db.table("Snippets")
         self._query = Query()
 
@@ -32,6 +38,11 @@ class TinyDbSnipperRepository(ISnippetRepository):
         return deserialize_many(self.table.all())
 
     def save(self, snp: Snippet) -> Snippet:
+        current_time = datetime.now()
+        snp.updated_at = current_time
+        if not self.exists(snp.alias):
+            snp.created_at = current_time
+
         doc_id = self.table.upsert(snp.dict(), self._query.alias == snp.alias)[0]
         return deserialize(self.table.get(doc_id=doc_id))
 
